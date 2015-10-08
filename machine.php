@@ -100,9 +100,15 @@ function simulate(insts, mem) {
       mem[parseInt(inst[2])] = {'val':mem[parseInt(inst[1])].val, 'color':'pink'};
     }
 
+    // Set the control index buffer.
+    mem[6] = {'val':control_old};
+    
     if (step)
       control++;
     $('#animation').append(memory(mem, control_old, counter));
+    
+    // Reset the output buffer.
+    mem[5] = {'val':-1};
   }
 }
 
@@ -111,6 +117,7 @@ function run() {
   var mem = {};
   for (var a = RANGE[0]; a < RANGE[1]; a++) 
     mem[a] = {'val':0};
+  mem[5] = {'val':-1};
   simulate($('#source').val().split('\n'), mem);
 }
     </script>
