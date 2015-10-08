@@ -89,6 +89,17 @@ function simulate(insts, mem) {
       mem[1].color = 'lightgreen';
       mem[2].color = 'lightgreen';
     }
+    
+    // Special "high-level" macro commands not in the actual language.
+    if (inst[0] == '#increment#' )
+      mem[parseInt(inst[1])] = {'val':mem[parseInt(inst[1])].val + 1, 'color':'pink'};
+    if (inst[0] == '#decrement#' )
+      mem[parseInt(inst[1])] = {'val':mem[parseInt(inst[1])].val - 1, 'color':'pink'};
+    if (inst[0] == '#copy#' ) {
+      mem[parseInt(inst[1])].color = "lightgreen";
+      mem[parseInt(inst[2])] = {'val':mem[parseInt(inst[1])].val, 'color':'pink'};
+    }
+
     if (step)
       control++;
     $('#animation').append(memory(mem, control_old, counter));
