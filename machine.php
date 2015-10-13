@@ -1,3 +1,9 @@
+<?php
+  // Support for loading a sequence of instructions via the URL.
+  $insts = "";
+  if (array_key_exists('instructions', $_GET))
+    $insts = str_replace('_', ' ', str_replace('~', "\n", $_GET['instructions']));
+?>
 <html>
   <head>
     <title>machine simulator</title>
@@ -125,7 +131,7 @@ function run() {
   <body style="text-align:center;" onload="resize();">
     <div style="margin:0 auto; width:950px;">
       <div id="source-container">
-        <textarea id="source" onkeyup="instructions();"></textarea><br/>
+        <textarea id="source" onkeyup="instructions();"><?php echo $insts; ?></textarea><br/>
         <button onclick="run();">simulate</button>
       </div>
       <div id="instructions"></div>
