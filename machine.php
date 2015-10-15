@@ -128,7 +128,9 @@ function run() {
 }
     </script>
   </head>
-  <body style="text-align:center;" onload="resize();">
+  <body style="text-align:center;" 
+        onload="resize();<?php if (strlen($insts) > 0) echo 'instructions();run();'; ?>"
+    >
     <div style="margin:0 auto; width:950px;">
       <div id="source-container">
         <textarea id="source" onkeyup="instructions();"><?php echo $insts; ?></textarea><br/>
