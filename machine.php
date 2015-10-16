@@ -9,9 +9,9 @@
     <title>machine simulator</title>
     <style>
 html, body { height:98%; width:98%; }
-#source-container { float:left; width:150px; margin:4px; padding:4px; background-color:white; border:1px solid #999999; }
-#source { font-family:Courier,Monospace; font-size:12px; line-height:14px; float:left; width:148px; margin:1px; padding:2px; border:0px solid #999999; }
-#instructions { font-family:Courier,Monospace; text-align:left; font-size:12px; float:left; width:150px; margin:4px; padding:8px 4px 4px 4px; background-color:#DDDDDD; }
+#source { float:left; width:175px; margin:4px; padding:4px; background-color:white; border:1px solid #999999; }
+#input { font-family:Courier,Monospace; font-size:12px; line-height:14px; float:left; width:173px; margin:1px; padding:2px; border:0px solid #999999; }
+#instructions { font-family:Courier,Monospace; text-align:left; font-size:12px; float:left; width:125px; margin:4px; padding:8px 4px 4px 4px; background-color:#DDDDDD; }
 #animation { float:left; min-width:600px; margin:4px; padding:4px; background-color:#DDDDDD; }
 .odd { display:block; background-color:#FFFFFF; line-height:14px; }
 .even { display:block; background-color:#EFEFEF; line-height:14px; }
@@ -27,8 +27,8 @@ html, body { height:98%; width:98%; }
 var RANGE = [-10, 17], LIMIT = 100;
 
 function resize() {
-  $('#source-container').height(window.innerHeight-40);
-  $('#source').height(window.innerHeight-70);
+  $('#source').height(window.innerHeight-40);
+  $('#input').height(window.innerHeight-70);
   $('#instructions').height(window.innerHeight-40);
   $('#animation').height(window.innerHeight-40);
 }
@@ -42,7 +42,7 @@ function highlight(control, counter) {
 }
 
 function instructions() {
-  var lines = $('#source').val().split("\n");
+  var lines = $('#input').val().split("\n");
   var out = '';
   for (var i = 0; i < lines.length; i++)
     out += '<span id="inst_' + i + '" class="inst ' + (i%2==1?'odd':'even') + '">' + i + ': '+ lines[i] + '&nbsp;</span>';
@@ -68,6 +68,10 @@ function simulate(insts, mem) {
   while (control < insts.length && counter < LIMIT) {
     counter++;
     var inst = insts[control].split(' '), step = true, control_old = control;
+
+    // Set the control index buffer.
+    mem[6] = {'val':control_old};
+
     if (inst[0] == 'goto') {
       control = insts.indexOf('label ' + inst[1]);
       step = false;
@@ -87,8 +91,9 @@ function simulate(insts, mem) {
     if (inst[0] == 'set' )
       mem[parseInt(inst[1])] = {'val':parseInt(inst[2]), 'color':'pink'};
     if (inst[0] == 'copy') {
+      var readAddr = mem[3].val;
       mem[mem[4].val] = {'val':mem[mem[3].val].val, 'color':'pink'};
-      mem[mem[3].val].color = 'lightgreen';
+      mem[readAddr].color = 'lightgreen';
     }
     if (inst[0] == 'add' ) {
       mem[0] = {'val':mem[1].val + mem[2].val, 'color':'pink'};
@@ -105,9 +110,6 @@ function simulate(insts, mem) {
       mem[parseInt(inst[1])].color = "lightgreen";
       mem[parseInt(inst[2])] = {'val':mem[parseInt(inst[1])].val, 'color':'pink'};
     }
-
-    // Set the control index buffer.
-    mem[6] = {'val':control_old};
     
     if (step)
       control++;
@@ -124,7 +126,7 @@ function run() {
   for (var a = RANGE[0]; a < RANGE[1]; a++) 
     mem[a] = {'val':0};
   mem[5] = {'val':-1};
-  simulate($('#source').val().split('\n'), mem);
+  simulate($('#input').val().split('\n'), mem);
 }
     </script>
   </head>
@@ -132,8 +134,8 @@ function run() {
         onload="resize();<?php if (strlen($insts) > 0) echo 'instructions();run();'; ?>"
     >
     <div style="margin:0 auto; width:950px;">
-      <div id="source-container">
-        <textarea id="source" onkeyup="instructions();"><?php echo $insts; ?></textarea><br/>
+      <div id="source">
+        <textarea id="input" onkeyup="instructions();"><?php echo $insts; ?></textarea><br/>
         <button onclick="run();">simulate</button>
       </div>
       <div id="instructions"></div>
