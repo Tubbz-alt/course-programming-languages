@@ -105,14 +105,17 @@ else: check('interpret', interpret, [\
     (("procedure h {print 3;} procedure g {print 2; call h; call h;} procedure f {call g; print 1; call g;} call f;",), [{'Number':[2]},{'Number':[3]},{'Number':[3]},{'Number':[1]},{'Number':[2]},{'Number':[3]},{'Number':[3]}])\
     ])
 
+def testIncrement(addr, initial):
+    return simulate(['set '+str(addr)+' '+str(initial)] + increment(addr) + copy(addr,5))
+
 print("Problem #2, part (a), increment()...")
 try: increment
 except: print("The increment() function is not defined.")
-else: check('increment', (lambda a,v: simulate(['set '+str(a)+' '+str(v)] + increment(a) + copy(a,5))), [\
-        ([9, 123], [124]),\
-        ([20, 234], [235]),\
-        ([100, 0], [1]),\
-        ([1000, 1], [2])\
+else: check('testIncrement', testIncrement, [\
+        ((9, 123), [124]),\
+        ((20, 234), [235]),\
+        ((100, 0), [1]),\
+        ((1000, 1), [2])\
         ])
 
 print("Problem #3, part (d), compile()...")
