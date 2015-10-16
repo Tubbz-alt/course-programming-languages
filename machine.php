@@ -45,7 +45,7 @@ function instructions() {
   var lines = $('#source').val().split("\n");
   var out = '';
   for (var i = 0; i < lines.length; i++)
-    out += '<span id="inst_' + i + '" class="inst ' + (i%2==1?'odd':'even') + '">' + lines[i] + '&nbsp;</span>';
+    out += '<span id="inst_' + i + '" class="inst ' + (i%2==1?'odd':'even') + '">' + i + ': '+ lines[i] + '&nbsp;</span>';
   $('#instructions').html(out);
 }
 
