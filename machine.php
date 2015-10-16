@@ -9,22 +9,23 @@
     <title>machine simulator</title>
     <style>
 html, body { height:98%; width:98%; }
-#source { float:left; width:175px; margin:4px; padding:4px; background-color:white; border:1px solid #999999; }
-#input { font-family:Courier,Monospace; font-size:12px; line-height:14px; float:left; width:173px; margin:1px; padding:2px; border:0px solid #999999; }
-#instructions { font-family:Courier,Monospace; text-align:left; font-size:12px; float:left; width:125px; margin:4px; padding:8px 4px 4px 4px; background-color:#DDDDDD; }
-#animation { float:left; min-width:600px; margin:4px; padding:4px; background-color:#DDDDDD; }
+#source { float:left; width:185px; margin:4px; padding:4px; background-color:white; border:1px solid #999999; }
+#input { font-family:Courier,Monospace; font-size:12px; line-height:14px; float:left; width:183px; margin:1px; padding:2px; border:0px solid #999999; }
+#instructions { font-family:Courier,Monospace; text-align:left; font-size:12px; float:left; width:185px; margin:4px; padding:8px 4px 4px 4px; background-color:#DDDDDD; }
+#animation { float:left; min-width:530px; margin:4px; padding:4px; background-color:#DDDDDD; }
 .odd { display:block; background-color:#FFFFFF; line-height:14px; }
 .even { display:block; background-color:#EFEFEF; line-height:14px; }
 .cell { display:inline-block; border:0px 0px 1px 0px; width:20px; margin:0px 1px 3px 1px; font-size:10px; font-family:Arial,sans-serif; background-color:#DDDDDD; }
 .cell_even { display:inline-block; border:1px solid #AAAAAA; width:20px; margin:1px 0px 1px 0px; font-size:10px; font-family:Arial,sans-serif; background-color:#FFFFFF; }
 .cell_odd { display:inline-block; border:1px solid #AAAAAA; width:20px; margin:1px 0px 1px 0px; font-size:10px; font-family:Arial,sans-serif; background-color:#DADADA; }
 .inst {}
+.line_number { color:#999999; }
 .mem { cursor:pointer; }
     </style>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
     <script>
-var RANGE = [-10, 17], LIMIT = 100;
+var RANGE = [-7, 17], LIMIT = 100;
 
 function resize() {
   $('#source').height(window.innerHeight-40);
@@ -46,7 +47,8 @@ function instructions() {
   var out = '';
   for (var i = 0; i < lines.length; i++)
     out += 
-      '<span id="inst_' + i + '" class="inst ' + (i%2==1?'odd':'even') + '">' 
+      '<span id="inst_' + i + '" class="inst ' + (i%2==1?'odd':'even') + '">'
+        + '<span class="line_number">' + (i < 10 ? '&nbsp;' : '') + i + ': ' + '</span>'
         + lines[i].split("#")[0] 
         + '&nbsp;</span>';
   $('#instructions').html(out);
