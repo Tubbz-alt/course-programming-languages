@@ -66,10 +66,13 @@ else: check('evalTerm', evalTerm, [\
         (({'x':{'Number':[123]}, 'y':{'Number':[123]}}, {'Plus': [{'Variable': ['x']}, {'Variable': ['y']}]}), {'Number': [246]}),\
         ])
 
+def testExecProgram(env, stmt):
+    return execProgram(env, stmt)[1]
+
 print("Problem #1, part (c), execProgram()...")
 try: execProgram
 except: print("The execProgram() function is not defined.")
-else: check('execProgram', (lambda env, stmt: execProgram(env, stmt)[1]), [\
+else: check('testExecProgram', testExecProgram, [\
         (({'y':'False'}, {'Print': [{'Not':[{'Variable':['y']}]}, 'End']}), ['True']),\
         (({}, {'If': ['True', {'Print': [{'Number': [4]}, 'End']}, 'End']}), [{'Number':[4]}]),\
         (({}, {'Assign': [{'Variable': ['x']}, 'False', {'Until': [{'Not': [{'Variable': ['x']}]}, {'Print': ['False', 'End']}, {'Print': ['True', 'End']}]}]}), ['True']),\
@@ -122,28 +125,28 @@ print("Problem #3, part (d), compile()...")
 try: compile
 except: print("The compile() function is not defined.")
 else: check(('simulate(compile(', '))'), lambda s: simulate(compile(s)), [\
-    (["print 123;"], [123]),\
-    (["print false; print true; print 4;"], [0, 1, 4]),\
-    (["x := 10; print x;"], [10]),\
-    (["x := 10; print x + x;"], [20]),\
-    (["x := 1; y := 2; z := 3; print x + y + z;"], [6]),\
-    (["print true and false;"], [0]),\
-    (["x := true xor false; print x;"], [1]),\
-    (["x := true xor false; print x and not(x);"], [0]),\
-    (["x := true; y := false; z := true; print (not(x) xor y) and z;"], [0]),\
-    (["if true {print 4;}"], [4]),\
-    (["if true {print true;} print false;"], [1,0]),\
-    (["x := false; until not(x) {print false;} print true;"], [1]),\
-    (["x := false; until x { x := true; } print false;"], [0]),\
-    (["x := false; y := false; until x {print false; x := y and true; if not(y) {y := true;} } print true;"], [0, 0, 1]),\
-    (["if true {print true;} print false;"], [1,0]),\
-    (["procedure f { } print 4;"], [4]),\
-    (["procedure example {print 4;} call example;"], [4]),\
-    (["x := 123; procedure example {print x;} call example; call example;"], [123,123]),\
-    (["procedure g {print 2;} procedure f {call g; print 1; call g;} call f;"], [2,1,2]),\
-    (["procedure g {print 2;} if true and true { call g; }"], [2]),\
-    (["procedure g {print 2;} procedure f {if true and true { call g; }} call g; call f;"], [2,2]),\
-    (["procedure h {print 3;} procedure g {print 2; call h; call h;} procedure f {call g; print 1; call g;} call f;"], [2,3,3,1,2,3,3])\
+    (("print 123;",), [123]),\
+    (("print false; print true; print 4;",), [0, 1, 4]),\
+    (("x := 10; print x;",), [10]),\
+    (("x := 10; print x + x;",), [20]),\
+    (("x := 1; y := 2; z := 3; print x + y + z;",), [6]),\
+    (("print true and false;",), [0]),\
+    (("x := true xor false; print x;",), [1]),\
+    (("x := true xor false; print x and not(x);",), [0]),\
+    (("x := true; y := false; z := true; print (not(x) xor y) and z;",), [0]),\
+    (("if true {print 4;}",), [4]),\
+    (("if true {print true;} print false;",), [1,0]),\
+    (("x := false; until not(x) {print false;} print true;",), [1]),\
+    (("x := false; until x { x := true; } print false;",), [0]),\
+    (("x := false; y := false; until x {print false; x := y and true; if not(y) {y := true;} } print true;",), [0, 0, 1]),\
+    (("if true {print true;} print false;",), [1,0]),\
+    (("procedure f { } print 4;",), [4]),\
+    (("procedure example {print 4;} call example;",), [4]),\
+    (("x := 123; procedure example {print x;} call example; call example;",), [123,123]),\
+    (("procedure g {print 2;} procedure f {call g; print 1; call g;} call f;",), [2,1,2]),\
+    (("procedure g {print 2;} if true and true { call g; }",), [2]),\
+    (("procedure g {print 2;} procedure f {if true and true { call g; }} call g; call f;",), [2,2]),\
+    (("procedure h {print 3;} procedure g {print 2; call h; call h;} procedure f {call g; print 1; call g;} call f;",), [2,3,3,1,2,3,3])\
     ])
 
 #eof
