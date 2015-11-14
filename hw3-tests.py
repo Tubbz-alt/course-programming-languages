@@ -32,10 +32,20 @@ def check(function, inputs_result_pairs):
 
     passed = 0
     for (inputs, result) in inputs_result_pairs:
-        try: output = eval(function)(*inputs)
-        except: output = None
-        if output == result: passed = passed + 1
-        else: print("\n  Failed on:\n    "+prefix+', '.join([str_(i) for i in inputs])+suffix+"\n\n"+"  Should be:\n    "+str(result)+"\n\n"+"  Returned:\n    "+str(output)+"\n")
+
+        output = None
+        try:
+             output = eval(function)(*inputs)
+        except:
+             output = '<Error>'
+
+        if output == result:
+            passed = passed + 1
+        elif output == '<Error>':
+            print("\n  Failed on:\n    "+prefix+', '.join([str_(i) for i in inputs])+suffix+"\n\n"+"  Should be:\n    "+str(result)+"\n\n"+"  A run-time error occurred!\n")
+        else:
+            print("\n  Failed on:\n    "+prefix+', '.join([str_(i) for i in inputs])+suffix+"\n\n"+"  Should be:\n    "+str(result)+"\n\n"+"  Returned:\n    "+str(output)+"\n")
+
     print("Passed " + str(passed) + " of " + str(len(inputs_result_pairs)) + " tests.")
     print("")
 

@@ -13,27 +13,26 @@ if interpretCheck.find('import parse') != -1 or\
     print('''You did not load the parse.py module correctly. You must use "exec(open('parse.py').read())". Exiting.''')
     exit()
 
-def check(name, function, inputs_result_pairs):
-    def str_(s):
-        return '"'+str(s)+'"' if type(s) == str else str(s)
-    if type(name) == tuple:
-        prefix = name[0]
-        suffix = name[1]
-    if type(name) == str:
-        prefix = name + '('
-        suffix = ')'
+def check(function, inputs_result_pairs):
+    def str_(s): return '"'+str(s)+'"' if type(s) == str else str(s)
+    (prefix, suffix) = (function + '(', ')')
 
     passed = 0
     for (inputs, result) in inputs_result_pairs:
+
+        output = None
         try:
-            output = function(inputs[0], inputs[1]) if len(inputs) == 2  else function(inputs[0])
+            output = eval(function)(*inputs)
         except:
             output = '<Error>'
 
-        if output != '<Error>' and output == result:
+        if output == result:
             passed = passed + 1
+        elif output == '<Error>':
+            print("\n  Failed on:\n    "+prefix+', '.join([str_(i) for i in inputs])+suffix+"\n\n"+"  Should be:\n    "+str(result)+"\n\n"+"  A run-time error occurred!\n")
         else:
             print("\n  Failed on:\n    "+prefix+', '.join([str_(i) for i in inputs])+suffix+"\n\n"+"  Should be:\n    "+str_(result)+"\n\n"+"  Returned:\n    "+str_(output)+"\n")
+
     print("Passed " + str(passed) + " of " + str(len(inputs_result_pairs)) + " tests.")
     print("")
 
@@ -43,7 +42,7 @@ def check(name, function, inputs_result_pairs):
 print("Problem #1, part (a), variable()...")
 try: variable
 except: print("The variable() function is not defined.")
-else: check('variable', variable, [\
+else: check('variable', [\
     ((["x"],), ('x', [])),\
     ((["test"],), ('test', [])),\
     ((["camelNotation123"],), ('camelNotation123', [])),\
@@ -54,7 +53,7 @@ else: check('variable', variable, [\
 print("Problem #1, part (a), number()...")
 try: number
 except: print("The number() function is not defined.")
-else: check('number', number, [\
+else: check('number', [\
     ((["123"],), (123, [])),\
     ((["0"],), (0, [])),\
     ((["1010"],), (1010, [])),\
@@ -66,7 +65,7 @@ else: check('number', number, [\
 print("Problem #1, part (b), formula()...")
 try: formula
 except: print("The formula() function is not defined.")
-else: check('formula', formula, [\
+else: check('formula', [\
     (("true".split(" "),), ('True', [])),\
     (("false".split(" "),), ('False', [])),\
     (("true and false".split(" "),), ({'And': ['True', 'False']}, [])),\
@@ -87,7 +86,7 @@ else: check('formula', formula, [\
 print("Problem #1, part (c), term()...")
 try: term
 except: print("The term() function is not defined.")
-else: check('term', term, [\
+else: check('term', [\
     (("123".split(" "),), ({'Number':[123]}, [])),\
     (("0".split(" "),), ({'Number':[0]}, [])),\
     (("x".split(" "),), ({'Variable': ['x']}, [])),\
@@ -104,7 +103,7 @@ else: check('term', term, [\
 print("Problem #1, part (d), program()...")
 try: program
 except: print("The program() function is not defined.")
-else: check('program', program, [\
+else: check('program', [\
     (("print true ;".split(" "),), ({'Print': ['True', 'End']}, [])),\
     (("assign x := 3 + 4 ; print x * x ;".split(" "),), ({'Assign': [{'Variable': ['x']}, {'Plus': [{'Number': [3]}, {'Number': [4]}]}, {'Print': [{'Mult': [{'Variable': ['x']}, {'Variable': ['x']}]}, 'End']}]}, [])),\
     (("assign x := true and false ; print false ;".split(" "),), ({'Assign': [{'Variable': ['x']}, {'And': ['True', 'False']}, {'Print': ['False', 'End']}]}, [])),\
@@ -124,7 +123,7 @@ else: check('program', program, [\
 print("Problem #2, part (a), evalTerm()...")
 try: evalTerm
 except: print("The evalTerm() function is not defined.")
-else: check('evalTerm', evalTerm, [\
+else: check('evalTerm', [\
     (({}, {'Number': [123]}), {'Number': [123]}),\
     (({'x':{'Number': [10]}}, {'Variable': ['x']}), {'Number': [10]}),\
     (({}, {'Plus': [{'Number': [1]}, {'Plus': [{'Mult': [{'Number': [2]}, {'Number': [3]}]}, {'Number': [4]}]}]}), {'Number': [11]}),\
@@ -150,7 +149,7 @@ else: check('evalFormula', evalFormula, [\
 print("Problem #2, part (c), execProgram()...")
 try: execProgram
 except: print("The execProgram() function is not defined.")
-else: check('execProgram', execProgram, [\
+else: check('execProgram', [\
     (({}, 'End'), ({}, [])),\
     (({}, {'Print': ['False', 'End']}), ({}, ['False'])),\
     (({'y':'False'}, {'Print': [{'Variable':['y']}, 'End']}), ({'y': 'False'}, ['False'])),\
@@ -161,7 +160,7 @@ else: check('execProgram', execProgram, [\
 print("Problem #2, part (d), interpret()...")
 try: interpret
 except: print("The interpret() function is not defined.")
-else: check('interpret', interpret, [\
+else: check('interpret', [\
     (("print true;",), ['True']),\
     (("print 1 + 2 + 3;",), [{'Number':[6]}]),\
     (("assign x := 3+4 ; print x*x+1;",), [{'Number':[50]}]),\

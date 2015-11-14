@@ -32,6 +32,7 @@ def check(function, inputs_result_pairs):
             print("\n  Failed on:\n    "+prefix+', '.join([str_(i) for i in inputs])+suffix+"\n\n"+"  Should be:\n    "+str(result)+"\n\n"+"  A run-time error occurred!\n")
         else:
             print("\n  Failed on:\n    "+prefix+', '.join([str_(i) for i in inputs])+suffix+"\n\n"+"  Should be:\n    "+str(result)+"\n\n"+"  Returned:\n    "+str(output)+"\n")
+
     print("Passed " + str(passed) + " of " + str(len(inputs_result_pairs)) + " tests.")
     print("")
 
