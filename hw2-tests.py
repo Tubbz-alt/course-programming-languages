@@ -24,13 +24,13 @@ def check(function, inputs_result_pairs):
         output = None
         try:
             output = eval(function)(*inputs)
-        except:
+        except Exception as e:
             output = '<Error>'
 
         if output == result:
             passed = passed + 1
         elif output == '<Error>':
-            print("\n  Error on:\n    " + callStr + "\n\n"+"  Should be:\n    "+str(result)+"\n\n"+"  A run-time error occurred!\n")
+            print("\n  Error on:\n    " + callStr + "\n\n"+"  Should be:\n    "+str_(result)+"\n\n"+"  A run-time error occurred!\n")
         else:
             print("\n  Failed on:\n    " + callStr + "\n\n"+"  Should be:\n    "+str_(result)+"\n\n"+"  Returned:\n    "+str_(output)+"\n")
 
