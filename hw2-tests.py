@@ -19,6 +19,7 @@ def check(function, inputs_result_pairs):
 
     passed = 0
     for (inputs, result) in inputs_result_pairs:
+        callStr = prefix+', '.join([str_(i) for i in inputs])+suffix
 
         output = None
         try:
@@ -29,9 +30,9 @@ def check(function, inputs_result_pairs):
         if output == result:
             passed = passed + 1
         elif output == '<Error>':
-            print("\n  Failed on:\n    "+prefix+', '.join([str_(i) for i in inputs])+suffix+"\n\n"+"  Should be:\n    "+str(result)+"\n\n"+"  A run-time error occurred!\n")
+            print("\n  Error on:\n    " + callStr + "\n\n"+"  Should be:\n    "+str(result)+"\n\n"+"  A run-time error occurred!\n")
         else:
-            print("\n  Failed on:\n    "+prefix+', '.join([str_(i) for i in inputs])+suffix+"\n\n"+"  Should be:\n    "+str_(result)+"\n\n"+"  Returned:\n    "+str_(output)+"\n")
+            print("\n  Failed on:\n    " + callStr + "\n\n"+"  Should be:\n    "+str_(result)+"\n\n"+"  Returned:\n    "+str_(output)+"\n")
 
     print("Passed " + str(passed) + " of " + str(len(inputs_result_pairs)) + " tests.")
     print("")
