@@ -49,7 +49,7 @@ function instructions() {
     out += 
       '<span id="inst_' + i + '" class="inst ' + (i%2==1?'odd':'even') + '">'
         + '<span class="line_number">' + (i < 10 ? '&nbsp;' : '') + i + ': ' + '</span>'
-        + lines[i].split("#")[0] 
+        + lines[i].split("#")[0] + (lines[i].split("#")[1] ? lines[i].split("#")[1] : '') + (lines[i].split("#")[2] ? lines[i].split("#")[2] : '')
         + '&nbsp;</span>';
   $('#instructions').html(out);
 }
