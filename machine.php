@@ -105,7 +105,12 @@ function simulate(insts, mem) {
       mem[1].color = 'lightgreen';
       mem[2].color = 'lightgreen';
     }
-    
+    if (inst[0] == 'mul' ) {
+      mem[0] = {'val':mem[1].val * mem[2].val, 'color':'pink'};
+      mem[1].color = 'lightgreen';
+      mem[2].color = 'lightgreen';
+    }
+
     // Special "high-level" macro commands not in the actual language.
     if (inst[0] == '#increment#' )
       mem[parseInt(inst[1])] = {'val':mem[parseInt(inst[1])].val + 1, 'color':'pink'};
