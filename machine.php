@@ -43,7 +43,7 @@ function highlight(control, counter) {
 }
 
 function instructions() {
-  var lines = $('#input').val().split("\n");
+  var lines = $('#input').val().replace(/\(|\)/g, "").split("\n");
   var out = '';
   for (var i = 0; i < lines.length; i++)
     out += 
@@ -136,7 +136,7 @@ function run() {
   for (var a = RANGE[0]; a < RANGE[1]; a++) 
     mem[a] = {'val':0};
   mem[5] = {'val':-1};
-  simulate($('#input').val().split('\n'), mem);
+  simulate($('#input').val().replace(/\(|\)/g, "").split('\n'), mem);
 }
     </script>
   </head>
