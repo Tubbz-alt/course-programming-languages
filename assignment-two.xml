@@ -1,0 +1,209 @@
+<sheaf>
+  <section>
+    <assignment title="More Parsing Algorithms and Interpreters">
+      <instructions>
+        <text><![CDATA[
+In this assignment you will implement a full, working interpreter for a small imperative programming language. You must submit two Python source files named <code>hw2/parse.py</code> and <code>hw2/interpret.py</code>. Please follow the <a href="#A">gsubmit</a> directions and remember to put your files in the <code>hw2</code> directory.
+        ]]></text>
+        <paragraph><![CDATA[
+Your solutions to each of the problem parts below will be graded on their correctness, concision, and mathematical legibility. The different problems and problem parts rely on the lecture notes and on each other; carefully consider whether you can use functions from the lecture notes, or functions you define in one part within subsequent parts.
+        ]]></paragraph>
+        <paragraph><![CDATA[
+<b style="color:green;">A testing script with several test cases is available for download: <a href="hw2-tests.py"><code>hw2-tests.py</code></a>. Feel free to modify or extend it as you see fit.</b>
+        ]]></paragraph>
+      </instructions>
+      <problems>
+        <problem>
+          <text><![CDATA[
+In this problem you will implement a parser for a simple programming language. All the functions you define in this problem should appear in the file <code>parse.py</code>. You may adapt the techniques and/or code from <b><a href="#assignment1">Assignment #1</a></b> where appropriate to complete this problem. Recall that all parsers take a sequence of tokens (and possibly a flag) as their input, and return a tuple containing a parse tree and a sequence of remaining tokens.
+          ]]></text>
+          <parts>
+            <part>
+              <text hooks="math"><![CDATA[
+Include in your code the parsers <code>variable()</code> and <code>number()</code> that can parse token sequences that conform to the following two productions. The functions should return a string or integer, respectively, <b>without wrapping the result in a dictionary</b>. If the first token in the token sequence supplied to a function does not correspond to the production, the function should return <code>None</code>.
+\begin{eqnarray}
+<i>variable</i> & ::= & <i>any alphanumeric string beginning with a lowercase alphabetical letter</i> \\
+<i>number</i> & ::= & <i>any valid non-negative integer</i>
+\end{eqnarray}
+              ]]></text>
+            </part>
+            <part>
+              <text hooks="math"><![CDATA[
+Implement a parser <code>formula()</code> that can parse token sequences that conform to the following production. You may need to perform left-recursion elimination on a production before you can implement a working parser. You should use the abstract syntax tree node labels <code>"And"</code>, <code>"Nonzero"</code>, <code>"Not"</code>, <code>"Variable"</code>, <code>"True"</code>, and <code>"False"</code>. <b style="color:green;">If the token sequence is not in the language defined by the production, the function should return <code>None</code> (this will be tested, and is necessary to receive full credit).</b> Note that to complete this part, you will need to assume that a parser for <i>term</i> is already implemented (you will then implement it in the next part of the problem, immediately below).
+\begin{eqnarray}
+<i>formula</i> & ::= & <i>formula</i> <b>and</b> <i>formula</i> \\
+            & | & <b>nonzero (</b> <i>term</i> <b>)</b> \\
+            & | & <b>not (</b> <i>formula</i> <b>)</b> \\
+            & | & <i>variable</i> \\
+            & | & <b>true</b> \\
+            & | & <b>false</b>
+\end{eqnarray}
+              ]]></text>
+            </part>
+            <part>
+              <text hooks="math"><![CDATA[
+Implement a parser <code>term()</code> that can parse token sequences that conform to the following productions. These productions ensure that the traditional order of operations for addition and multiplication is preserved in a parse tree. However, you may need to perform left-recursion elimination on a production before you can implement a working parser. You should use the abstract syntax tree node labels <code>"Plus"</code>, <code>"Mult"</code>, <code>"Parens"</code>, <code>"If"</code>, <code>"Variable"</code>, and <code>"Number"</code>. <b style="color:green;">If the token sequence is not in the language defined by the production, the function should return <code>None</code> (this will be tested, and is necessary to receive full credit).</b>
+\begin{eqnarray}
+<i>term</i> & ::= & <i>factor</i> <b>+</b> <i>term</i> \\
+            & | & <i>factor</i> \\
+<i>factor</i> & ::= & <i>factor</i> <b>*</b> <i>factor</i> \\
+            & | & <b>(</b> <i>term</i> <b>)</b> \\
+            & | & <b>if</b> <b>(</b> <i>formula</i> <b>,</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> \\
+            & | & <i>variable</i> \\
+            & | & <i>number</i>
+\end{eqnarray}
+              ]]></text>
+            </part>
+            <part>
+              <text hooks="math"><![CDATA[
+Implement a parser <code>program()</code> that can parse token sequences that conform to the following production. You may want to implement a helper parser function <code>expression()</code>. You should use the abstract syntax tree node labels <code>"Print"</code>, <code>"Assign"</code>, <code>"If"</code>, <code>"DoUntil"</code>, and <code>"End"</code>. Note that the last choice in the production defining <i>program</i> is meaningful: it means that an empty token sequence is a valid program. The parse tree corresponding to an empty program should be <code>"End"</code>. <b style="color:green;">If the token sequence is not in the language defined by the production, the function should return <code>None</code> (this will be tested, and is necessary to receive full credit).</b>
+\begin{eqnarray}
+<i>program</i> & ::= & <b>print</b> <i>expression</i> <b>;</b> <i>program</i> \\
+                 & | & <b>assign</b> <i>variable</i> <b>:=</b> <i>expression</i> <b>;</b> <i>program</i>\\
+                 & | & <b>if</b> <i>expression</i> <b>{</b> <i>program</i> <b>}</b> <i>program</i>\\
+                 & | & <b>do</b> <b>{</b> <i>program</i> <b>}</b> <b>until</b> <i>expression</i> <b>;</b> <i>program</i>\\
+                 & | & \\
+<i>expression</i> & ::= & <i>formula</i> \\
+                  & | & <i>term</i> \\
+\end{eqnarray}
+Recall that the last <i>program</i> subtree in each of the choices in the production defining <i>program</i> represents the <i>rest</i> of the program. For example, in the choice "<b>if</b> <i>expression</i> <b>{</b> <i>program</i> <b>}</b> <i>program</i>", the first <i>program</i> subtree is the body of the <b>if</b> statement, while the second <i>program</i> subtree is the rest of the program. For another example, the following is one possible program in this language:
+              ]]></text>  
+              <code hooks="Python">
+if true {
+  print true;
+}
+print true;
+              </code>
+            </part>
+          </parts>
+        </problem>
+        <problem>
+          <text><![CDATA[
+In this problem you will implement an interpreter for a simple programming language. All the functions you define in this problem should appear in the file <code>interpret.py</code>. Your interpreter must conform to the operational semantics for this language, as presented in each of the problem parts below.
+          ]]></text>
+          <parts>
+            <part>
+              <text hooks="math"><![CDATA[
+Implement a function <code>evalTerm(env, t)</code> that takes an environment <code>env</code> and a parse tree <code>t</code> as its two arguments. The function should return the value that corresponds to the evaluation of the parse tree <code>t</code>, as determined by the operational semantics below.
+              ]]></text>
+              <inferences hooks="math">
+                <inference title="Term-Number">
+                  <premises><![CDATA[]]></premises>
+                  <conclusion><![CDATA[\Sigma, %n \Downarrow %n]]></conclusion>
+                </inference>
+                <inference title="Term-Variable">
+                  <premises><![CDATA[\Sigma(%x) = %v]]></premises>
+                  <conclusion><![CDATA[\Sigma, %x \Downarrow %v]]></conclusion>
+                </inference>
+                <inference title="Term-Parens">
+                  <premises><![CDATA[\Sigma, %t \Downarrow %v]]></premises>
+                  <conclusion><![CDATA[\Sigma, <b>(</b> %t <b>)</b> \Downarrow %v]]></conclusion>
+                </inference>
+                <inference title="Term-If-True">
+                  <premises><![CDATA[\Sigma, %f \Downarrow <b>true</b> %~ %~ \Sigma, %t_1 \Downarrow %v_1]]></premises>
+                  <conclusion><![CDATA[\Sigma, <b>if</b> <b>(</b> %f <b>,</b> %t_1 <b>,</b> %t_2 <b>)</b> \Downarrow %v_1]]></conclusion>
+                </inference>
+                <inference title="Term-If-False">
+                  <premises><![CDATA[\Sigma, %f \Downarrow <b>false</b> %~ %~ \Sigma, %t_2 \Downarrow %v_2]]></premises>
+                  <conclusion><![CDATA[\Sigma, <b>if</b> <b>(</b> %f <b>,</b> %t_1 <b>,</b> %t_2 <b>)</b> \Downarrow %v_2]]></conclusion>
+                </inference>
+                <inference title="Term-Plus">
+                  <premises><![CDATA[\Sigma, %t_1 \Downarrow %v_1 %~ %~ \Sigma, %t_2 \Downarrow %v_2]]></premises>
+                  <conclusion><![CDATA[\Sigma, %t_1 <b>+</b> %t_2 \Downarrow %v_1 + %v_2]]></conclusion>
+                </inference>
+                <inference title="Term-Mult">
+                  <premises><![CDATA[\Sigma, %t_1 \Downarrow %v_1 %~ %~ \Sigma, %t_2 \Downarrow %v_2]]></premises>
+                  <conclusion><![CDATA[\Sigma, %t_1 <b>*</b> %t_2 \Downarrow %v_1 \cdot %v_2]]></conclusion>
+                </inference>
+              </inferences>
+            </part>
+            <part>
+              <text hooks="math"><![CDATA[
+Implement a function <code>evalFormula(env, f)</code> that takes an environment <code>env</code> and a parse tree <code>f</code> as its two arguments. The function should return the value that corresponds to the evaluation of the parse tree <code>f</code>, as determined by the operational semantics below.
+              ]]></text>
+              <inferences hooks="math">
+                <inference title="Formula-True">
+                  <premises><![CDATA[]]></premises>
+                  <conclusion><![CDATA[\Sigma, <b>true</b> \Downarrow <b>true</b>]]></conclusion>
+                </inference>
+                <inference title="Formula-False">
+                  <premises><![CDATA[]]></premises>
+                  <conclusion><![CDATA[\Sigma, <b>false</b> \Downarrow <b>false</b>]]></conclusion>
+                </inference>
+                <inference title="Formula-Variable">
+                  <premises><![CDATA[\Sigma(%x) = %v]]></premises>
+                  <conclusion><![CDATA[\Sigma, %x \Downarrow %v]]></conclusion>
+                </inference>
+                <inference title="Formula-Nonzero-True">
+                  <premises><![CDATA[\Sigma, %t \Downarrow %v %~ %~ %v &ne; 0]]></premises>
+                  <conclusion><![CDATA[\Sigma, <b>nonzero</b> <b>(</b> %t <b>)</b> \Downarrow <b>true</b>]]></conclusion>
+                </inference>
+                <inference title="Formula-Nonzero-False">
+                  <premises><![CDATA[\Sigma, %t \Downarrow %v %~ %~ %v = 0]]></premises>
+                  <conclusion><![CDATA[\Sigma, <b>nonzero</b> <b>(</b> %t <b>)</b> \Downarrow <b>false</b>]]></conclusion>
+                </inference>
+                <inference title="Formula-Not">
+                  <premises><![CDATA[\Sigma, %f \Downarrow %v]]></premises>
+                  <conclusion><![CDATA[\Sigma, <b>not (</b> %f <b>)</b> \Downarrow \neg %v]]></conclusion>
+                </inference>
+                <inference title="Formula-And">
+                  <premises><![CDATA[\Sigma, %f_1 \Downarrow %v_1 %~ %~ \Sigma, %f_2 \Downarrow %v_2]]></premises>
+                  <conclusion><![CDATA[\Sigma, %f_1 <b>and</b> %f_2 \Downarrow %v_1 \wedge %v_2]]></conclusion>
+                </inference>
+              </inferences>
+            </part>
+            <part>
+              <text hooks="math"><![CDATA[
+Implement a function <code>execProgram(env, s)</code> that takes an environment <code>env</code> and a parse tree <code>s</code> as its two arguments. The function should return a tuple containing the output (represented as a list of values) and an updated environment that represent the result of the execution of the program <code>s</code> as determined by the operational semantics below. Note that <b style="color:gray;">end ;</b> corresponds to the empty token sequence and is used as a placeholder to make the notation unambiguous. <b style="color:green;">You should <i>not</i> use the Python <code>while</code> or  <code>for</code> control construct, or any other looping construct, anywhere in your implementation of the [Statement-Until-*] cases; you will only receive credit if you use recursion as determined by the inference rules.</b>
+              ]]></text>
+              <inferences hooks="math">
+                <inference title="Statement-Print">
+                  <premises><![CDATA[\Sigma_1, %p \Downarrow \Sigma_2, %o %~ %~ \Sigma_1, %e \Downarrow %v]]></premises>
+                  <conclusion><![CDATA[\Sigma_1, <b>print</b> %e <b>;</b> %p \Downarrow \Sigma_2, %v;%o]]></conclusion>
+                </inference>
+                <inference title="Statement-Assign">
+                  <premises><![CDATA[\Sigma_1 \uplus {%x \mapsto %v}, %p \Downarrow \Sigma_2, %o %~ %~ \Sigma_1, %e \Downarrow %v]]></premises>
+                  <conclusion><![CDATA[\Sigma_1, <b>assign</b> %x <b>:=</b> %e <b>;</b> %p \Downarrow \Sigma_2, %o]]></conclusion>
+                </inference>
+                <inference title="Statement-If-False">
+                  <premises><![CDATA[\Sigma_1, %p_2 \Downarrow \Sigma_2, %o_1 %~ %~ \Sigma_1, %e \Downarrow <b>false</b>]]></premises>
+                  <conclusion><![CDATA[\Sigma_1, <b>if</b> %e <b>{</b> %p_1 <b>}</b> %p_2 \Downarrow \Sigma_2, %o_1]]></conclusion>
+                </inference>
+                <inference title="Statement-If-True">
+                  <premises><![CDATA[\Sigma_1, %p_1 \Downarrow \Sigma_2, %o_1 %~ %~ \Sigma_2, %p_2 \Downarrow \Sigma_3, %o_2 %~ %~ \Sigma_1, %e \Downarrow <b>true</b>]]></premises>
+                  <conclusion><![CDATA[\Sigma_1, <b>if</b> %e <b>{</b> %p_1 <b>}</b> %p_2 \Downarrow \Sigma_3, %o_1;%o_2]]></conclusion>
+                </inference>
+                <inference title="Statement-Do-Until-True">
+                  <premises><![CDATA[\Sigma_1, %p_1 \Downarrow \Sigma_2, %o_1 %~ %~ \Sigma_2, %e \Downarrow <b>true</b> %~ %~ \Sigma_2, %p_2 \Downarrow \Sigma_3, %o_2]]></premises>
+                  <conclusion><![CDATA[\Sigma_1, <b>do</b> <b>{</b> %p_1 <b>}</b> <b>until</b> %e <b>;</b> %p_2 \Downarrow \Sigma_3, %o_1;%o_2]]></conclusion>
+                </inference>
+                <inference title="Statement-Do-Until-False">
+                  <premises><![CDATA[
+                    \Sigma_1, %p_1 \Downarrow \Sigma_2, %o_1 
+                    %~ %~ \Sigma_2, %e \Downarrow <b>false</b>
+                    %~ %~ \Sigma_2, <b>do</b> <b>{</b> %p_1 <b>}</b> <b>until</b> %e <b>;</b> %p_2 \Downarrow \Sigma_3, %o_2 
+                  ]]></premises>
+                  <conclusion><![CDATA[\Sigma_1, <b>do</b> <b>{</b> %p_1 <b>}</b> <b>until</b> %e <b>;</b> %p_2 \Downarrow \Sigma_3, %o_1;%o_2]]></conclusion>
+                </inference>
+                <inference title="Statement-End">
+                  <premises><![CDATA[]]></premises>
+                  <conclusion><![CDATA[\Sigma, <b style="color:gray;">end ;</b> \Downarrow \Sigma, %o_0]]></conclusion>
+                </inference>
+              </inferences>
+            </part>
+            <part>
+              <text hooks="math"><![CDATA[
+Implement a function <code>interpret()</code> that takes a single string as its argument. The function should tokenize the string and parse it to generate a parse tree. If parsing fails, it should return <code>None</code>; otherwise, it should execute the parse tree to obtain an <i><a href="#db57dc0684174cd097ebf73d733dc9bc">output</a></i>. It should then return the output. <b style="color:green;">Your implementation only needs to interpret entire programs (you do not need to interpret stand-alone terms or formulas).</b>
+              ]]></text>
+            </part>
+          </parts>
+        </problem>
+        <problem>
+          <text><![CDATA[
+<b>Extra credit:</b> Add the choices <b>(</b> <i>term</i> <b>=</b> <i>term</i> <b>)</b>, <b>(</b> <i>term</i> <b>&lt;</b> <i>term</i> <b>)</b> and <b>(</b> <i>term</i> <b>&gt;</b> <i>term</i> <b>)</b> to the <i>formula</i> production rule in the language, and extend the parsing and evaluation algorithms accordingly (you can use <code>Equal</code>, <code>Less</code>, and <code>Greater</code> for the tree node labels).
+          ]]></text>
+        </problem>
+      </problems>
+    </assignment>
+  </section>
+</sheaf>

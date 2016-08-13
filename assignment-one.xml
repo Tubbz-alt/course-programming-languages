@@ -1,0 +1,190 @@
+<sheaf>
+  <section>
+    <assignment title="Grammars, Lexing, and Parsing">
+      <instructions>
+        <text><![CDATA[
+In this assignment you will be implementing lexing and parsing algorithms using Python. You must submit a single Python source file named <code>hw1/hw1.py</code>. <b style="color:firebrick;">An incorrect file path and/or file name will result in an automatic 10-point deduction.</b> Please follow the <a href="#A">gsubmit</a> directions.
+        ]]></text>
+        <paragraph><![CDATA[
+Your solutions to each of the problem parts below will be graded on their correctness, concision, and mathematical legibility. The different problems and problem parts rely on the lecture notes and on each other; carefully consider whether you can use functions from the lecture notes, or functions you define in one part within subsequent parts.
+        ]]></paragraph>
+        <paragraph><![CDATA[
+<b style="color:green;">A testing script with many test cases is available for download: <a href="hw1-tests.py"><code>hw1-tests.py</code></a>. You should be able to place it in the same directory as <code>hw1.py</code> and run it. Feel free to modify or extend it as you see fit.</b>
+        ]]></paragraph>
+      </instructions>
+      <problems>
+        <problem>
+          <parts>
+            <part>
+              <text><![CDATA[
+Implement a function <code>regexp()</code> that takes a list of tokens and returns a single string. This string should be a regular expression that matches only the tokens in that list and nothing else.
+              ]]></text>
+              <code hooks="Python"><![CDATA[
+>>> re.match(regexp(["abc", "def", "xyz"]), "abc")
+<_sre.SRE_Match object; span=(0, 3), match='abc'>
+>>> re.match(regexp(["abc", "def", "xyz"]), "ghi")
+@None
+              ]]></code>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>tokenize()</code> that takes two arguments: a list of terminals and a concrete syntax character string to tokenize. It should build a regular expression, use that regular expression to convert the second string into a token sequence (represented in Python as a list of strings), and then return that token sequence. <b style="color:green;">You should not assume the tokens will always be separated by spaces in the concrete syntax</b>.
+              ]]></text>
+              <code hooks="Python">
+>>> tokenize(["red", "blue", "#"], "red#red blue# red#blue")
+['red', '#', 'red', 'blue', '#', 'red', '#', 'blue']
+              </code>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a predictive recursive descent parsing algorithm <code>tree()</code> that takes a token sequence (represented in Python as a list of strings) and parses that token sequence into a parse tree according to the following grammar definition:
+              ]]></text>
+              <text hooks="math"><![CDATA[
+\begin{eqnarray}
+<i>tree</i> & ::= & <b>two</b> <b>children</b> <b>start</b> <i>tree</i> <b>;</b> <i>tree</i> <b>end</b> \\
+                  & | & <b>one</b> <b>child</b> <b>start</b> <i>tree</i> <b>end</b>\\
+                  & | & <b>zero</b> <b>children</b>
+\end{eqnarray}
+              ]]></text>
+              <text><![CDATA[
+Each node in the parse tree should be labeled <code>"Two"</code>, <code>"One"</code>, or <code>"Zero"</code>. An example input and output are provided below. <b style="color:green;">Note that your implementation of <code>tree()</code> must return a tuple containing the parse tree as well as the token list containing the remaining unparsed tokens (the token list may be empty).</b>
+              ]]></text>
+              <code hooks="Python"><![CDATA[
+>>> tree(tokenize(\
+               ["children", "child", "two", "one", "zero", "start", "end", ";"],\
+               "one child start two children start one child start zero children end; zero children end end"\
+              ))
+({'One': [{'Two': [{'One': ['Zero']}, 'Zero']}]}, [])
+              ]]></code>
+              <text><![CDATA[
+For a different view of the parse tree component (the first element in the output tuple above), we reproduce below the parse tree with indentation using the <code>json</code> module. <b style="color:green;">Your implementation does not need to format its results in this way and can produce it in the above format.</b>
+              ]]></text>
+              <code hooks="Python"><![CDATA[
+{'One': [
+    {'Two': [
+        {'One': [
+            'Zero'
+          ]
+        },
+        'Zero'
+      ]
+    }
+  ]
+}
+              ]]></code>
+            </part>
+          </parts>
+        </problem>
+        <problem>
+          <text><![CDATA[
+In this problem you will implement a complete parser for a programming language with the following grammar definition (note that in this language, variables always appear with an initial <b>$</b> character and numeric literals always appear with an initial <code>#</code> character, and these special characters could be separated by whitespace from the actual variable or number):
+          ]]></text>
+          <text hooks="math"><![CDATA[
+\begin{eqnarray}
+<i>program</i> & ::= & <b>print</b> <i>term</i> <b>;</b> <i>program</i> \\
+                 & | & <b>input</b> <b>$</b> <i>variable</i> <b>;</b> <i>program</i> \\
+                 & | & <b>assign</b> <b>$</b> <i>variable</i> <b>:=</b> <i>term</i> <b>;</b> <i>program</i> \\
+                 & | & <b>end</b> <b>;</b> \\
+<i>formula</i> & ::= & <b>true</b> \\
+               & | & <b>false</b> \\ 
+               & | & <b>not (</b> <i>formula</i> <b>)</b> \\
+               & | & <b>xor (</b> <i>formula</i> <b>,</b> <i>formula</i> <b>)</b> \\
+               & | & <b>equal (</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> \\
+               & | & <b>less (</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> \\
+               & | & <b>greater (</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> \\
+<i>term</i> & ::= & <b>#</b> <i>number</i> \\
+            & | & <b>$</b> <i>variable</i> \\
+            & | & <b>plus (</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> \\
+            & | & <b>max (</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> \\
+            & | & <b>if (</b> <i>formula</i> <b>,</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> \\
+<i>variable</i> & ::= & non-empty character strings containing only alphabetical characters (lowercase or uppercase) \\
+<i>number</i> & ::= & <code>0|([1-9][0-9]*)</code>
+\end{eqnarray}
+          ]]></text>
+          <text><![CDATA[
+In addition to a function corresponding to the tokenization algorithm, the parser implementation will consist of five interdependent Python functions: <code>program()</code>, <code>formula()</code>, <code>term()</code>, <code>variable()</code>, and <code>number()</code>. Each function corresponds to one of the productions. Below is an implementation of <code>number()</code>:
+          ]]></text>
+          <code hooks="Python">
+@import re
+@def number(tokens):
+    @if re.match(r"^(0|([1-9][0-9]*))$", tokens[0]):
+        @return ({"Number": [@int(tokens[0])]}, tokens[1:])
+          </code>
+          <text><![CDATA[
+You should examine each of the other productions to determine whether a <a href="#47254608df414ace8d04c630a2b15689">predictive recursive descent</a> parser or a <a href="#95cb72f5b4d24ddba2c8081c7b42618a">backtracking recursive descent</a> parser is required. You should also make calls within each function to one or more of the other functions as needed.
+          ]]></text>
+          <text><![CDATA[     
+<p>Your algorithm must parse all programs in this programming language correctly. However, it need not return useful error messages if the input provided does not conform to the grammar definition.</p>
+          ]]></text>
+          <parts>
+            <part>
+               <text><![CDATA[
+Implement a function <code>variable()</code> that takes a single token list as an argument and, if the token sequence conforms to the grammar definition, returns a tuple containing two values: an instance of the abstract syntax (i.e., parse tree) with the root node label <code>"Variable"</code>, and the remaining, unparsed suffix of the input token sequence.
+               ]]></text>
+            </part>
+            <part>
+               <text><![CDATA[
+Implement a function <code>term()</code> that takes a single token list as an argument and, if the token sequence conforms to the grammar definition, returns a tuple containing two values: an instance of the abstract syntax (i.e., parse tree) with an appropriate root node label (<code>"Plus"</code>, <code>"Max"</code>, <code>"If"</code>, <code>"Variable"</code>, or <code>"Number"</code>), and the remaining, unparsed suffix of the input token sequence.
+               ]]></text>
+               <code hooks="Python">
+>>> term(['max', '(', 'plus', '(', '#', '2', ',', '#', '3', ')', ',', '#', '4', ')'])
+(
+  { "Max": [
+      { "Plus": [
+          { "Number": [2]}, 
+          { "Number": [3]}
+        ]
+      },
+      { "Number": [4]}
+    ]
+  },
+  [] # Empty token sequence.
+)
+              </code>
+            </part>
+            <part>
+               <text><![CDATA[
+Implement a function <code>formula()</code> that takes a single token list as an argument and, if the token sequence conforms to the grammar definition, returns a tuple containing two values: an instance of the abstract syntax (i.e., parse tree) with an appropriate root node label (<code>"True"</code>, <code>"False"</code>, <code>"Not"</code>, <code>"Xor"</code>, <code>"Equal"</code>, <code>"Less"</code>, or <code>"Greater"</code>), and the remaining, unparsed suffix of the input token sequence.
+               ]]></text>
+            </part>
+            <part>
+               <text><![CDATA[
+Implement a function <code>program()</code> that takes a single token list as an argument and, if the token sequence conforms to the grammar definition, returns a tuple containing two values: an instance of the abstract syntax (i.e., parse tree) with an appropriate root node label (<code>"Print"</code>, <code>"Input"</code>, <code>"Assign"</code>, or <code>"End"</code>), and the remaining, unparsed suffix of the input token sequence.
+               ]]></text>
+            </part>
+            <part>
+               <text><![CDATA[
+Implement a function <code>parse()</code> that takes a single string as an argument. If the input string conforms to the grammar of the programming language, the function should return a parse tree corresponding to that input string.
+               ]]></text>
+            </part>
+          </parts>
+        </problem>
+        <problem>
+          <text><![CDATA[
+Extend or modify your parser from the previous problem to support the following grammar:
+          ]]></text>
+          <text hooks="math"><![CDATA[
+\begin{eqnarray}
+<i>program</i> & ::= & <b>print</b> <i>term</i> <b>;</b> <i>program</i> \\
+               & | & <b>input</b> <b>$</b> <i>variable</i> <b>;</b> <i>program</i> \\
+               & | & <b>assign</b> <b>$</b> <i>variable</i> <b>:=</b> <i>term</i> <b>;</b> <i>program</i> \\
+               & | & <b>end</b> <b>;</b> \\
+<i>formula</i> & ::= & <b>true</b> | <b>false</b> | <b>not (</b> <i>formula</i> <b>)</b> | <b>xor (</b> <i>formula</i> <b>,</b> <i>formula</i> <b>)</b> \\
+               & | & <b>equal (</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> | <b>less (</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> | <b>greater (</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> \\
+               & | & <b>(</b> <i>formula</i> <b>xor</b> <i>formula</i> <b>)</b> \\
+               & | & <b>(</b> <i>term</i> <b>==</b> <i>term</i> <b>)</b> | <b>(</b> <i>term</i> <b>&lt;</b> <i>term</i> <b>)</b> | <b>(</b> <i>term</i> <b>&gt;</b> <i>term</i> <b>)</b> \\
+<i>term</i> & ::= & <b>#</b> <i>number</i> | <b>$</b> <i>variable</i> | <b>plus (</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> | <b>max (</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> | <b>if (</b> <i>formula</i> <b>,</b> <i>term</i> <b>,</b> <i>term</i> <b>)</b> \\
+              & | & <b>(</b> <i>term</i> <b>+</b> <i>term</i> <b>)</b> | <b>(</b> <i>term</i> <b>max</b> <i>term</i> <b>)</b> \\
+              & | & <b>(</b> <i>formula</i> <b>?</b> <i>term</i> <b>:</b> <i>term</i> <b>)</b> \\
+<i>variable</i> & ::= & non-empty character strings containing only alphabetical characters (lowercase or uppercase) \\
+<i>number</i> & ::= & positive integers or negative integers preceded by <b>&minus;</b>
+\end{eqnarray}
+          ]]></text>
+          <text><![CDATA[
+The language that conforms to the above grammar is a strict superset of the language in the previous problem, so your solution should behave the same way as before on the subset of the language in the previous problem. You may use the same parse tree labels for both the prefix and infix notation for each construct and operator (<b>+</b> corresponds to <b>plus</b>, <b>?</b> and <b>:</b> are the <a href="https://en.wikipedia.org/wiki/%3F:">ternary operator</a> and correspond to <b>if</b>, <b>==</b> corresponds to <b>equal</b>, <b>&lt;</b> corresponds to <b>less</b>, and <b>&gt;</b> corresponds to <b>greater</b>).
+          ]]></text>
+        </problem>
+      </problems>
+    </assignment>
+  </section>
+</sheaf>

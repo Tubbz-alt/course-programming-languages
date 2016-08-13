@@ -1,0 +1,202 @@
+<sheaf>
+  <section>
+    <assignment title="Compilation and Review of Interpretation">
+      <instructions>
+        <text><![CDATA[
+In this assignment you will practice implementing interpretation and compilation algorithms using Python. You must submit four Python source files:
+<ul>
+  <li><code><a href="hw3/parse.py">hw3/parse.py</a></code> (there is no need to modify this file);</li>
+  <li><code><a href="hw3/interpret.py">hw3/interpret.py</a></code>;</li>
+  <li><code><a href="hw3/machine.py">hw3/machine.py</a></code>;</li>
+  <li><code><a href="hw3/compile.py">hw3/compile.py</a></code>.</li>
+</ul>
+Please follow the <a href="#A">gsubmit</a> directions and remember to put your files in the <code>hw3</code> directory.
+        ]]></text> 
+        <paragraph><![CDATA[
+Your solutions to each of the problem parts below will be graded on their correctness, concision, and mathematical legibility. The different problems and problem parts rely on the lecture notes and on each other; carefully consider whether you can use functions from the lecture notes, or functions you define in one part within subsequent parts.
+        ]]></paragraph> 
+        <paragraph><![CDATA[
+<b style="color:green;">A testing script with several test cases is available for download: <a href="hw3-tests.py"><code>hw3-tests.py</code></a>. You should be able to place it in the same directory with the other assignment files and run it. Feel free to modify or extend it as you see fit.</b>
+<!--<br/><br/>
+<b style="color:green;">A full solution to this assignment is now available here: <a href="hw3/solutions/"><code>/hw3/solutions</code></a>.</b>-->
+        ]]></paragraph>
+      </instructions>
+      <problems>
+        <problem>
+          <text hooks="math"><![CDATA[
+In this problem, you will implement an interpreter for a high-level language. All the functions you define should be included in the file <code><a href="hw3/interpret.py">hw3/interpret.py</a></code>. The abstract syntax for the language is presented below:
+\begin{eqnarray}
+<i>term</i> & ::= &  <i>number</i> | <i>variable</i> | <i>term</i> <b>+</b> <i>term</i> \\
+<i>formula</i> & ::= &  <b>true</b> | <b>false</b> | <i>variable</i>
+                  | <b>not</b> <b>(</b> <i>formula</i> <b>)</b> | <i>formula</i> <b>and</b> <i>formula</i> | <i>formula</i> <b>xor</b> <i>formula</i> \\
+<i>expression</i> & ::= & <i>term</i> | <i>formula</i> \\
+<i>program</i> & ::= & <b>print</b> <i>expression</i> <b>;</b> <i>program</i> \\
+                 & | & <i>variable</i> <b>:=</b> <i>expression</i> <b>;</b> <i>program</i>\\
+                 & | & <b>if</b> <i>expression</i> <b>{</b> <i>program</i> <b>}</b> <i>program</i>\\
+                 & | & <b>until</b> <i>expression</i> <b>{</b> <i>program</i> <b>}</b> <i>program</i>\\
+                 & | & <b>procedure</b> <i>variable</i> <b>{</b> <i>program</i> <b>}</b> <i>program</i>  \\
+                 & | & <b>call</b> <i>variable</i> <b>;</b> <i>program</i>  \\
+                 & | & \\
+\end{eqnarray}
+The relevant portions of the operational semantics are provided below (let \oplus represent the logical exclusive or operation, which can be simulated with the Python built-in relational operator <code>!=</code>):
+        ]]></text>
+              <inferences hooks="math">
+                <inference title="Term-Variable">
+                  <premises><![CDATA[\Sigma(%x) = %v]]></premises>
+                  <conclusion><![CDATA[\Sigma, %x \Downarrow %v]]></conclusion>
+                </inference>
+                <inference title="Formula-Variable">
+                  <premises><![CDATA[\Sigma(%x) = %v]]></premises>
+                  <conclusion><![CDATA[\Sigma, %x \Downarrow %v]]></conclusion>
+                </inference>
+                <inference title="Formula-Not">
+                  <premises><![CDATA[\Sigma, %f \Downarrow %v]]></premises>
+                  <conclusion><![CDATA[\Sigma, <b>not</b> <b>(</b> %f <b>)</b> \Downarrow \neg %v]]></conclusion>
+                </inference>
+                <inference title="Formula-Xor">
+                  <premises><![CDATA[\Sigma, %f_1 \Downarrow %v_1 %~ %~ \Sigma, %f_2 \Downarrow %v_2]]></premises>
+                  <conclusion><![CDATA[\Sigma, %f_1 <b>xor</b> %f_2 \Downarrow %v_1 \oplus %v_2]]></conclusion>
+                </inference>
+                <inference title="Formula-And-Short">
+                  <premises><![CDATA[\Sigma, %f_1 \Downarrow <b>false</b>]]></premises>
+                  <conclusion><![CDATA[\Sigma, %f_1 <b>and</b> %f_2 \Downarrow <b>false</b>]]></conclusion>
+                </inference>
+                <inference title="Formula-And">
+                  <premises><![CDATA[\Sigma, %f_1 \Downarrow %v_1 %~ %~ \Sigma, %f_2 \Downarrow %v_2]]></premises>
+                  <conclusion><![CDATA[\Sigma, %f_1 <b>and</b> %f_2 \Downarrow %v_1 \wedge %v_2]]></conclusion>
+                </inference>
+                <inference title="Statement-Assign">
+                  <premises><![CDATA[\Sigma_1 \uplus {%x \mapsto %v}, %p \Downarrow \Sigma_2, %o %~ %~ \Sigma_1, %e \Downarrow %v]]></premises>
+                  <conclusion><![CDATA[\Sigma_1, %x <b>:=</b> %e <b>;</b> %p \Downarrow \Sigma_2, %o]]></conclusion>
+                </inference>
+                <inference title="Statement-Procedure">
+                  <premises><![CDATA[\Sigma_1 \uplus {%x \mapsto %p_1}, %p_2 \Downarrow \Sigma_2, %o]]></premises>
+                  <conclusion><![CDATA[\Sigma_1, <b>procedure</b> %x <b>{</b> %p_1 <b>}</b> %p_2 \Downarrow \Sigma_2, %o]]></conclusion>
+                </inference>
+                <inference title="Statement-Call">
+                  <premises><![CDATA[\Sigma_1(%x) = %p_1 %~ %~ \Sigma_1, %p_1 \Downarrow \Sigma_2, %o_1 %~ %~ \Sigma_2, %p_2 \Downarrow \Sigma_3, %o_2]]></premises>
+                  <conclusion><![CDATA[\Sigma_1, <b>call</b> %x <b>;</b> %p_2 \Downarrow \Sigma_3, %o_1;%o_2]]></conclusion>
+                </inference>
+              </inferences>
+          <text hooks="math"><![CDATA[
+The remaining rules 
+<span style="font-variant:small-caps;">[Term-Number]</span>, 
+<span style="font-variant:small-caps;">[Term-Plus]</span>, 
+<span style="font-variant:small-caps;">[Formula-True]</span>, 
+<span style="font-variant:small-caps;">[Formula-False]</span>,
+<span style="font-variant:small-caps;">[Statement-Print]</span>,
+<span style="font-variant:small-caps;">[Statement-If-False]</span>,
+<span style="font-variant:small-caps;">[Statement-If-True]</span>, 
+<span style="font-variant:small-caps;">[Statement-Until-False]</span>, 
+<span style="font-variant:small-caps;">[Statement-Until-True]</span>, and
+<span style="font-variant:small-caps;">[Statement-End]</span> are exactly the same as those in <b><a href="#assignment2">Assignment #2</a></b> or in <a href="#4ebc67e9336c475a939d6c8c0dcedc36">this example</a>. Notice that in all these inference rules, the environment now also contains mappings from procedure names to procedure bodies.
+          ]]></text>
+          <parts>
+            <part>
+              <text><![CDATA[
+Implement a function <code>evalTerm(env, t)</code> that takes an environment <code>env</code> and a parse tree <code>t</code> as its two arguments. The function should return the value that corresponds to the evaluation of the parse tree <code>t</code>, as determined by the operational semantics.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>evalFormula(env, f)</code> that takes an environment <code>env</code> and a parse tree <code>f</code> as its two arguments. The function should return the value that corresponds to the evaluation of the parse tree <code>t</code>, as determined by the operational semantics.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>execProgram(env, s)</code> that takes an environment <code>env</code> and a parse tree <code>s</code> as its two arguments. The function should return a tuple containing an updated environment and the output (represented as a list of values) that represent the result of the execution of the program <code>s</code> as determined by the operational semantics.
+              ]]></text>
+            </part>
+          </parts>
+        </problem>
+        <problem>
+          <text><![CDATA[
+In this problem you will implement several helper functions for building sequences of instructions in a machine language. The file <a href="hw3/machine.py"><code>hw3/machine.py</code></a> already contains a simulator for the machine language with which you will be working; the machine language is defined in detail in <a href="#3246043602d540668dc63d5b6277a47f">a previous example in the lecture notes</a>.
+Although any correct implementation is acceptable, it is suggested that you follow the conventions below:
+<ul>
+  <li>use negative memory addresses, starting at <code>-1</code>, for the stack;</li>
+  <li>use memory address <code>7</code> to store the memory address of the top of the stack;</li>
+  <li>use memory addresses <code>8</code> and higher for the heap (i.e., results of computations).</li>
+</ul>
+All the functions you define should be included in the file <code><a href="hw3/machine.py">hw3/machine.py</a></code>. 
+          ]]></text>
+          <parts>
+            <part>
+              <text><![CDATA[
+Implement a function <code>increment(addr)</code> that takes a single integer argument <code>addr</code>. The function should return a list of instructions (in which each instruction is represented as a string in the list). These instructions should correspond to a machine language program that increments by <code>1</code> the integer stored in the memory location <code>addr</code> and cleans up any memory addresses it used in the process by setting them back to <code>0</code>.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>decrement(addr)</code> that takes a single integer argument <code>addr</code>. The function should return a sequence of instructions (represented as a Python list of strings). These instructions should correspond to a machine language program that decrements by <code>1</code> the integer stored in the memory location <code>addr</code> and cleans up any memory addresses it used in the process by setting them back to <code>0</code>.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>call(name)</code> that takes a single argument: <code>name</code> is a string corresponding to the name of a procedure. The function should return a sequence of instructions that performs the following operations:
+<ul>
+  <li>update the integer stored in the memory address that contains the address of the top of the call stack (i.e., decrement it, since the stack is in the part of memory indexed using negative integers);</li>
+  <li>store the current program location at the top of the call stack;</li>
+  <li>increment the value at the top of the call stack so it refers to the location in the program to which control should return after the end of the procedure being invoked;</li>
+  <li><b>goto</b> the procedure body that corresponds to the procedure <code>name</code> supplied;</li>
+  <li>update the integer stored in the memory address that contains the address of the top of the call stack (i.e., increment it, since the stack is in the part of memory indexed using negative integers).</li>
+</ul>
+The third step above is crucial: failing to specify the correct return location in the program can lead to an infinite loop.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>procedure(name, body)</code> that takes two arguments: <code>name</code> is a string corresponding to the name of a procedure, and <code>body</code> is a sequence of machine language instructions (represented as a Python list of strings). The function should return a sequence of instructions that includes:
+<ul>
+  <li>a <b>goto</b> instruction so that the procedure body is skipped by default if instructions are being executed sequentially;</li>
+  <li>a label identifying the start of the procedure body;</li>
+  <li>the procedure body</li>
+  <li>instructions to <b>jump</b> back to the machine language program location that invoked the procedure;</li>
+  <li>a label identifying the end of the procedure body.</li>
+</ul>
+              ]]></text>
+            </part>
+          </parts>
+        </problem>
+        <problem>
+          <text><![CDATA[
+In this problem you will implement a compiler; your solutions for this problem should appear in the file <code><a href="hw3/compile.py">hw3/compile.py</a></code>. The source language of the compiler will be the language for which you implemented an interpreter in <b>Problem #1</b>. The target language will be the machine language with which you worked in <b>Problem #2</b>.
+          ]]></text>
+          <parts>
+            <part>
+              <text><![CDATA[
+Implement a function <code>compileTerm(env, t, heap)</code> that takes three arguments: <code>env</code> is a mapping from variables to memory addresses, <code>t</code> is a <i>term</i> parse tree, and <code>heap</code> is the memory address of the current top of the heap. The function should return a tuple <code>(insts, addr, heap)</code> in which <code>insts</code> is a sequence of machine language instructions (represented as a Python list of strings) that perform the computation represented by the parse tree, <code>addr</code> is the address of the result, and <code>heap</code> is an integer representing the memory of the top of the heap after the computation is performed.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>compileFormula(env, f, heap)</code>. The requirements for this function are the same as those for <code>compileTerm(env, t, heap)</code>, except that it must handle <i>formula</i> parse trees.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>compileProgram(env, s, heap)</code> that takes three arguments: <code>env</code> is a mapping from variables to memory addresses, <code>s</code> is a <i>program</i> parse tree, and <code>heap</code> is the memory address of the current top of the heap. The function should return a tuple <code>(env, insts, heap)</code> in which <code>env</code> is an updated environment, <code>insts</code> is a sequence of machine language instructions (represented as a Python list of strings) that perform the computation represented by the parse tree, and <code>heap</code> is an integer representing the memory of the top of the heap after the computation is performed.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>compile(s)</code> that takes a single string <code>s</code> that is a concrete syntax representation of a program in the source programming language and returns its compiled form: a sequence of instructions in the target machine language.
+              ]]></text>
+            </part>
+          </parts>
+        </problem>
+        <problem>
+          <text><![CDATA[
+<b>Extra credit:</b> Add support for the binary equality operator <b>equal (</b><i>term</i> <b>,</b> <i>term</i> </b> to <i>formula</i>. The file <code><a href="hw3/parse.py">hw3/parse.py</a></code> has been updated to support this operator and to emit the <code>'Equal'</code> node when this operation appears in the concrete syntax. You must extend both the interpreter and compiler to support this operator. The inference rule for this operation is provided below.
+          ]]></text>
+          <inferences hooks="math">
+                <inference title="Formula-Equal">
+                  <premises><![CDATA[\Sigma, %t_1 \Downarrow %v_1 %~ %~ \Sigma, %t_2 \Downarrow %v_2]]></premises>
+                  <conclusion><![CDATA[\Sigma, <b>equal</b> <b>(</b> %t_1 <b>,</b> %t_2 <b>)</b> \Downarrow %v_1 = %v_2]]></conclusion>
+                </inference>
+          </inferences>
+        </problem>
+      </problems>
+    </assignment>
+  </section>
+</sheaf>

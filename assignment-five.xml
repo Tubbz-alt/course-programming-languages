@@ -1,0 +1,265 @@
+<sheaf>
+  <section>
+    <assignment title="State Space Search and Embedded Languages">
+      <instructions>
+        <text><![CDATA[
+In this assignment you will practice using the declarative and functional programming language Haskell by implementing a library and an embedded language for building algorithms that solve optimization problems. You must submit four files (please follow the <a href="#A">gsubmit</a> directions and remember to put your files in the <code>hw5</code> directory):
+<ul>
+  <li><code><a href="hw5/BinPacking.hs">hw5/BinPacking.hs</a></code>;</li>
+  <li><code><a href="hw5/SuperString.hs">hw5/SuperString.hs</a></code>;</li>
+  <li><code><a href="hw5/Graph.hs">hw5/Graph.hs</a></code>;</li>
+  <li><code><a href="hw5/Algorithm.hs">hw5/Algorithm.hs</a></code>.</li>
+</ul>
+        ]]></text>
+        <paragraph><![CDATA[
+Your solutions to each of the problem parts below will be graded on their correctness, concision, and mathematical legibility. The different problems and problem parts rely on the lecture notes and on each other; carefully consider whether you can use functions from the lecture notes, or functions you define in one part within subsequent parts.
+        ]]></paragraph>
+        <paragraph><![CDATA[
+<b style="color:green;">A testing script with several test cases is available for download: <a href="hw5-tests.hs"><code>hw5-tests.hs</code></a>. You should be able to place it in the same directory with the other assignment files and load it. Feel free to modify or extend it as you see fit.</b>
+        ]]></paragraph>
+        <text hooks="math"><![CDATA[
+The modules <code><a href="hw5/Graph.hs">Graph.hs</a></code> and <code><a href="hw5/Algorithm.hs">Algorithm.hs</a></code> will contain libraries for building state space graphs and state space search algorithms. The modules <code><a href="hw5/BinPacking.hs">BinPacking.hs</a></code> and <code><a href="hw5/SuperString.hs">SuperString.hs</a></code> will use these libraries to solve specific optimization problems.
+        ]]></text>
+      </instructions>
+      <problems>
+        <problem>
+          <text><![CDATA[
+<b>(15 pts.)</b> The optimization problem modeled in <code><a href="hw5/BinPacking.hs">BinPacking.hs</a></code> is defined as follows: given a list of items, each of a certain integer size, put each item into one of two bins so that once all items have been allocated, the sum of the items in the first bin is as close as possible to the sum of the items in the second bin (this problem is NP-complete and is equivalent to the <a href="http://en.wikipedia.org/wiki/Subset_sum_problem">subset sum problem</a>, so no efficient solution for the problem is believed to exist).
+          ]]></text>      
+          <paragraph><![CDATA[
+We represent an allocation of items to bins (either in the midst of running an algorithm or within a final result) using the data type <code>BinPacking</code>, in which the two bin totals so far and remaining list of items are captured under the constructor <code>BinPack</code>:
+            ]]></paragraph>
+          <code hooks="Haskell"><![CDATA[
+@data BinPacking = BinPack Bin Bin [Item] @deriving (Eq, Show)
+          ]]></code>
+          <parts>
+            <part>
+              <text><![CDATA[
+One packing <code>b :: BinPacking</code> is <i>better</i> than another packing <code>b' :: BinPacking</code> if the difference between the two bin totals in <code>b</code> is less than the difference between the two bin totals in <code>b'</code>. Add an instance declaration for the <code>BinPack</code> type so that it is possible to use the built-in Haskell infix operators <code>&lt;</code> and <code>&lt;=</code> to compare two bin packings according to their differences. You may use the Haskell library function <code>abs :: Integer -> Integer</code> to compute the absolute value of an integer. Note that the list of items is ignored, since we are only comparing the two packed bins. <b style="color:green;">If you're getting a stack overflow when testing <code>&lt;</code>, make sure you also define <code>&lt;=</code> explicitly.</b>
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> (BinPack 1 4 [4,5]) < (BinPack 5 10 [4,5])
+True
+*> (BinPack 10 4 []) < (BinPack 1 3 [])
+False
+              ]]></code>
+            </part>
+            <part>
+              <text><![CDATA[
+Make <code>BinPacking</code> type a member of the <code>State</code> type class by adding an <code>instance</code> declaration defining the <code>outcome :: BinPacking -> Bool</code> and <code>choices :: BinPacking -> (BinPacking, BinPacking)</code> functions (<b>in an <code>instance</code> declaration, Haskell does not require or allow type annotations, so use them for reference but do not add them explicitly</b>).
+              ]]></text>      
+              <paragraph><![CDATA[
+A value of type <code>BinPacking</code> represents an outcome only if there are no more items left to allocate; each non-outcome <code>BinPacking</code> value has two possible choices on how to proceed next: by adding the item at the top of the item list to the left bin, or by adding the item at the top of the list to the right bin.
+              ]]></paragraph>
+              <code hooks="Haskell"><![CDATA[
+*> outcome (BinPack 4 6 [])
+True
+*> choices (BinPack 0 1 [2,3,4,5])
+(BinPack 2 1 [3,4,5], BinPack 0 3 [3,4,5])
+              ]]></code>
+            </part>
+          </parts>
+        </problem>
+        <problem>
+          <text><![CDATA[
+<b>(15 pts.)</b> The optimization problem modeled in <code><a href="hw5/SuperString.hs">SuperString.hs</a></code> is defined as follows: find the shortest superstring that can be built from a sequence of arriving strings (a <i>superstring</i> is a string that contains all the strings in the sequence, with overlapping allowed). Variants of the <a href="https://en.wikipedia.org/wiki/Shortest_common_supersequence_problem">shortest superstring problem</a> are encountered in both DNA sequencing and data compression, among many other areas; the problem in its general form is NP-complete.
+          ]]></text>      
+          <paragraph><![CDATA[
+We represent an instance of the problem using the data type <code>SuperString</code>, in which the current superstring and the remaining string sequences are captured under the constructor <code>SuperStr</code>:
+          ]]></paragraph>
+          <code hooks="Haskell"><![CDATA[
+@data SuperString = SuperStr String [String] @deriving (Eq, Show)
+          ]]></code>
+          <parts>
+            <part>
+              <text><![CDATA[
+One state <code>s :: SuperString</code> is <i>better</i> than another state <code>s' :: SuperString</code> if the superstring built in <code>s</code> is shorter. Add an instance declaration for the <code>SuperString</code> type so that it is possible to use the built-in Haskell infix operators <code>&lt;</code> and <code>&lt;=</code> to compare two states according to superstring lengths.
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> (SuperStr "bcaa" ["xy","za"]) < (SuperStr "abcaa" ["xy","za"])
+True
+*> (SuperStr "aabbcc" []) < (SuperStr "aabc" [])
+False
+              ]]></code>
+            </part>
+            <part>
+              <text><![CDATA[
+Make <code>SuperString</code> a member of the <code>State</code> type class by adding an <code>instance</code> declaration defining the <code>outcome :: SuperString -> Bool</code> and <code>choices :: SuperString -> (SuperString, SuperString)</code> functions. You are given a function <code>merge :: String -> String -> String</code> for merging strings (order matters):
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> merge "caa" "aabb"
+"caabb"
+*> merge "cax" "yabb"
+"caxyabb"
+              ]]></code>
+              <paragraph><![CDATA[
+A value of type <code>SuperString</code> represents an outcome only if there are no more strings left to merge; each non-outcome <code>SuperString</code> value has two possible choices on how to proceed next: by merging the string at the top of the string sequence to the superstring on the left side, or by merging it to the superstring on the right side. 
+              ]]></paragraph>
+              <code hooks="Haskell"><![CDATA[
+*> outcome (SuperStr "abc" ["ccd"])
+False
+*> choices (SuperStr "aabb" ["ccaa", "dd", "ee"])
+(SuperStr "aabbccaa" ["dd", "ee"], SuperStr "ccaabb" ["dd", "ee"])
+              ]]></code>
+            </part>
+          </parts>
+        </problem>
+        <problem>    
+          <text hooks="math"><![CDATA[
+<b>(42 pts.)</b> The <code><a href="hw5/Graph.hs">Graph.hs</a></code> module is used to build state space graphs (finite or infinite). We represent the graph of possible states that an algorithm can traverse given a starting state using the polymorphic <code>Graph a</code> data type:
+          ]]></text>
+          <code hooks="Haskell"><![CDATA[
+@data Graph a =
+    Choices a (Graph a, Graph a)
+  | Outcome a
+  @deriving (Eq, Show)
+          ]]></code>
+          <parts>
+            <part>
+              <text><![CDATA[
+Define a parametric polymorphic function <code>mapTuple :: (a -> b) -> (a, a) -> (b, b)</code> that takes a function of type <code>a -> b</code> and applies it to both elements of a tuple.
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> mapTuple not (True, False)
+(False, True)
+              ]]></code>           
+            </part>
+            <part>
+              <text><![CDATA[
+Define a parametric polymorphic function <code>state :: Graph a -> a</code> that takes a state space graph and returns the state at the root node of that graph. We provide an example of how this function can be used from inside the <code><a href="hw5/BinPacking.hs">BinPacking.hs</a></code> module:
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> state (Choices (BinPack 1 2 [3]) (Outcome (BinPack 4 2 []), Outcome (BinPack 1 5 [])))
+BinPack 1 2 [3]
+              ]]></code>           
+            </part>
+            <part>
+              <text><![CDATA[
+One graph <code>g :: Graph a</code> is <i>better</i> (i.e., <i>less than</i>) than another graph <code>g' :: Graph a</code> if according to the ordering on states, the contents of <code>g</code> are <i>less than</i> the contents of <code>g'</code>. Add an instance declaration for the <code>Graph a</code> type so that it is possible to use the built-in Haskell infix operators <code>&lt;</code> and <code>&lt;=</code> to compare two graphs (regardless of what the type <code>a</code> of the states in the graph might be).
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> (Outcome (BinPack 1 4 [])) < (Outcome (BinPack 5 10 []))
+True
+*> (Outcome 23) <= (Outcome 12)
+False
+              ]]></code>
+            </part>
+            <part>
+              <text><![CDATA[
+Define a function <code>graph :: State a => a -> Graph a</code> that takes a starting state and returns the full graph (possibly infinite) of all possible state space traversals starting at that state. An example of this function being used from inside the <code><a href="hw5/SuperString.hs">SuperString.hs</a></code> module is provided (spacing has been adjusted for legibility):
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> graph (SuperStr "x" ["ab", "bc"])
+Choices (SuperStr "x" ["ab","bc"]) (
+  Choices (SuperStr "xab" ["bc"]) (
+    Outcome (SuperStr "xabc" []),
+    Outcome (SuperStr "bcxab" [])
+  ),
+  Choices (SuperStr "abx" ["bc"]) (
+    Outcome (SuperStr "abxbc" []),
+    Outcome (SuperStr "bcabx" [])
+  )
+)
+              ]]></code>
+            </part>
+            <part>
+              <text><![CDATA[
+Define the parametric polymorphic function <code>depths :: Integer -> Graph a -> [Graph a]</code> that returns a list of all the graphs that are at depth exactly <code>n</code> within the supplied state space graph (the root node is at depth <code>0</code>).
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Define the function <code>fold :: State a => (a -> b) -> (a -> (b, b) -> b) -> Graph a -> b</code> that takes two functions <code>o :: a -> b</code> and <code>c :: a -> (b, b) -> b</code> and performs a fold operation over the last (third) argument: a state space graph <code>g :: Graph a</code>.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Define the function <code>outcomes :: State a => Graph a -> [Graph a]</code> that returns the list of <i>all</i> the leaf nodes of the supplied state space graph. <b>Solutions must use <code>fold</code> and must fit on one line; all other solutions will receive no credit.</b>
+              ]]></text>
+            </part>
+          </parts>
+        </problem>
+        <problem>
+          <text><![CDATA[
+<b>(28 pts.)</b> In the module <code><a href="hw5/Algorithm.hs">Algorithm.hs</a></code>, you will implement a small library for creating optimization algorithms; a function of type <code>Algorithm a</code> takes a graph, chooses some descendant node in the graph, and returns the subgraph for which that descendant node is the root.
+          ]]></text>
+          <code hooks="Haskell"><![CDATA[
+@type Algorithm a = Graph a -> Graph a
+          ]]></code>
+          <parts>
+            <part>
+              <text><![CDATA[
+Define an algorithm <code>greedy :: Ord a => Algorithm a</code> that takes a graph as an input. It should choose and return the <i>better</i> of the two children of the root.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Define an algorithm <code>patient :: Ord a => Integer -> Algorithm a</code> that takes an integer argument <code>n</code> and a graph as its two inputs, and chooses and returns the <i>best</i> descendant of the supplied graph that can be found at depth <code>n</code> (an allocation is <i>best</i> if it is better than all others at that depth). If <code>n</code> is <code>0</code>, the function should simply return the graph supplied to it as an input.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Define an algorithm <code>optimal :: (State a, Ord a) => Algorithm a</code> that takes a state space graph, and returns the leaf node in the state space graph that has the <i>best</i> allocation. <b>Hint:</b> you can define this function in one lines.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Define a meta-algorithm <code>metaCompose :: Algorithm a -> Algorithm a -> Algorithm a</code> that takes two algorithms as arguments. It should apply the first algorithm to obtain a new subgraph, and then it should apply the second algorithm to that subgraph and return the result.
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> (metaCompose greedy greedy) (graph (BinPack 0 0 [1,2,3]))
+Choices (BinPack 2 1 [3]) (Outcome (BinPack 5 1 []), Outcome (BinPack 2 4 []))
+              ]]></code>
+            </part>
+            <part>
+              <text><![CDATA[
+Define a meta-algorithm <code>metaRepeat :: Integer -> Algorithm a -> Algorithm a</code> that repeats a given algorithm a specified number of times. Your definition of <code>metaRepeat</code> should take three arguments having types <code>Integer</code>, <code>Algorithm a</code>, and <code>Graph a</code>. If the integer is <code>0</code>, it should simply return the graph unchanged. If the integer is positive, it should apply the algorithm the specified number of times to the graph and then return the result.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Define a meta-algorithm <code>metaGreedy :: Ord a => Algorithm a -> Algorithm a -> Algorithm a</code> that takes two algorithms as its inputs. It should apply the two algorithms to its input graph and should return the <i>better</i> of the two results that it obtains.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+In a comment, describe one way in which <code>impatient</code> algorithm below is superior to <code>patient</code>, and one way in which it is inferior.
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+impatient :: Ord a => Integer -> Algorithm a
+impatient n g = (metaRepeat n greedy) g
+              ]]></code>
+            </part>
+          </parts>
+        </problem>
+        <problem>
+          <text><![CDATA[
+<b>Extra credit (5 pts.):</b> Define a meta-algorithm <code>fit :: Graph a -> [Algorithm a] -> Algorithm a</code> that takes a graph and a list of algorithms as inputs; this meta-algorithm should choose the algorithm in the list of algorithms that has the best performance on the given graph, and return it. <b>Hint:</b> define a way to compare strategies and use <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-List.html#v:minimumBy"><code>minimumBy</code></a>.
+          ]]></text>
+        </problem>
+        <problem>
+          <text><![CDATA[
+<b>Extra extra credit (35 pts.):</b> Complete the following tasks to create an embedded language for algorithms that allows users to predict the worst-case performance of an algorithm without actually running it or even choosing the type of state space graph on which it must run.
+          ]]></text>
+          <parts>
+            <part>
+              <text><![CDATA[
+Complete the definition of the <code>interpret :: (State a, Ord a) => Alg -> Algorithm a</code> function for embedded algorithm descriptions of type <code>Alg</code>. Running the interpreter should produce exactly the algorithm described by the supplied data type value of type <code>Alg</code>.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Make <code>Time</code> a member of the <code>Num</code> type class so that numeric literals, <code>+</code>, and <code>*</code> can all be used to operate on values of type <code>Time</code>. Adding infinity or multiplying by infinity should yield infinity.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Complete the definition of the <code>performance :: Alg -> Time</code> function, which should compute the number of steps (i.e., state comparisons) that an algorithm might perform in the worst case. You may use the <code>^</code> operator for exponentiation of integers.
+              ]]></text>
+            </part>
+          </parts>
+        </problem>
+      </problems>
+    </assignment>
+  </section>
+</sheaf>

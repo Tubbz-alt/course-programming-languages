@@ -1,0 +1,251 @@
+<sheaf>
+  <section>
+    <assignment title="Declarative Programming Languages">
+      <instructions>
+        <text><![CDATA[
+In this assignment you will implement an interpreter using Python for a declarative language, and you will practice using the declarative programming language Haskell. You must submit four files:
+<ul>
+  <li><code><a href="hw4/parse.py">hw4/parse.py</a></code> (there is no need to modify this file);</li>
+  <li><code><a href="hw4/interpret.py">hw4/interpret.py</a></code>;</li>
+  <li><code><a href="hw4/Tree.hs">hw4/Tree.hs</a></code>;</li>
+  <li><code><a href="hw4/Interpret.hs">hw4/Interpret.hs</a></code>.</li>
+</ul>
+Please follow the <a href="#A">gsubmit</a> directions and remember to put your files in the <code>hw4</code> directory.
+        ]]></text>
+        <paragraph><![CDATA[
+Your solutions to each of the problem parts below will be graded on their correctness, concision, and mathematical legibility. The different problems and problem parts rely on the lecture notes and on each other; carefully consider whether you can use functions from the lecture notes, or functions you define in one part within subsequent parts.
+        ]]></paragraph>
+        <paragraph><![CDATA[
+<b style="color:green;">A testing script with several test cases is available for download: <a href="hw4-tests.py"><code>hw4-tests.py</code></a>. You should be able to place it in the same directory with the other assignment files and run it. Feel free to modify or extend it as you see fit.</b>
+        ]]></paragraph>
+      </instructions>
+      <problems>
+        <problem>
+          <text><![CDATA[
+In this problem you will implement helper functions for performing substitution and unification. Your solutions should be included in the file <code><a href="hw4/interpret.py">hw4/interpret.py</a></code>.
+          ]]></text>
+          <parts>
+            <part>
+              <text><![CDATA[
+Implement a function <code>subst(s, a)</code> that takes two arguments: a substitution <code>s</code> (represented as a Python dictionary), and an abstract syntax tree <code>a</code>. The function should return a new abstract syntax tree in which every variable in the tree that is in the domain of <code>s</code> has been substituted according to the substitution <code>s</code>. You may assume that variables are always represented using a subtree of the form <code>{"Variable":[ ... ]}</code>, as in all previous examples and assignments.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>unify(a, b)</code> that takes two arguments: two syntax trees <code>a</code> and <code>b</code>. The function should return the smallest substitution <code>s</code> that satisfies the following equation:
+              ]]></text>
+              <code hooks="Python"><![CDATA[
+subst(s, a) == subst(s, b)
+              ]]></code>
+              <text><![CDATA[
+You should implement the <a href="#95e800c8e74e4991a2ddb48668b544e0">pattern matching unification</a> algorithm for this assignment.
+              ]]></text>
+            </part>
+          </parts>
+        </problem>
+        <problem>
+          <text hooks="math"><![CDATA[
+In this problem, you will implement an interactive interpreter for a declarative language (a small, untyped version of a subset of Haskell). All the functions you define should be included in the file <code><a href="hw4/interpret.py">hw4/interpret.py</a></code>. The abstract syntax for the language is presented below; a complete parser that parses the concrete syntax for this language into the abstract syntax below can be found in <code><a href="hw4/parse.py">hw4/parse.py</a></code>. Notice that in the concrete syntax, constructor names always begin with an uppercase letter, while variable names always begin with a lowercase letter.
+\begin{eqnarray}
+declaration %d & ::= & %f <b>(</b> %p <b>)</b> <b>=</b> %e <b>;</b> %d \\
+                 & | & \\
+pattern %p & ::= & %c %p %p \\
+             & | & %c \\
+             & | & %n \\
+             & | & %x \\
+             & | & <b>(</b> %p <b>)</b> \\
+expression %e & ::= & %c %e %e \\
+             & | & %c \\
+             & | & %n \\
+             & | & %x \\
+             & | & <b>(</b> %e <b>)</b> \\
+             & | & %e <b>*</b> %e \\
+             & | & %f <b>(</b> %e <b>)</b> \\
+number %n & ::= & <code>0|[1-9][0-9]*</code> \\
+constructor %c & ::= & <code>[A-Z][A-Za-z]*</code> \\
+variable %x, %f & ::= & <code>[a-z][A-Za-z]*</code>
+\end{eqnarray}
+The relevant portions of the operational semantics are provided below:
+        ]]></text>
+          <parts>
+            <part>
+              <text><![CDATA[
+Implement a function <code>build(m, d)</code> that takes a finite map <code>m</code> (i.e., a Python dictionary mapping names to lists of (<i>pattern</i>, <i>expression</i>) tuples) and a <i>declaration</i> parse tree <code>d</code>. The function should return the finite map <code>m</code> that represents the module definition that is assembled according to the operational semantics presented below:
+              ]]></text>
+              <inferences hooks="math">
+                <inference title="Declaration-Function-First">
+                  <premises><![CDATA[
+                    %f \not\in \dom(%M_1) 
+                    %~ %~ %M_1 \uplus {%f \mapsto {(%p, %e)}} %d \Downarrow %M_2
+                  ]]></premises>
+                  <conclusion><![CDATA[
+                    %M_1, %f <b>(</b> %p <b>)</b> <b>=</b> %e <b>;</b> %d \Downarrow %M_2
+                  ]]></conclusion>
+                </inference>
+                <inference title="Declaration-Function-More">
+                  <premises><![CDATA[
+                    %f \in \dom(%M_1)
+                    %~ %~ %M_1 \uplus {%f \mapsto (%M_1(%f) \uplus {(%p, %e)})} %d \Downarrow %M_2
+                  ]]></premises>
+                  <conclusion><![CDATA[
+                    %M_1, %f <b>(</b> %p <b>)</b> <b>=</b> %e <b>;</b> %d \Downarrow %M_2
+                  ]]></conclusion>
+                </inference>
+                <inference title="Declaration-End">
+                  <premises><![CDATA[]]></premises>
+                  <conclusion><![CDATA[%M, <b style="color:gray;">end</b> \Downarrow %M]]></conclusion>
+                </inference>
+              </inferences>
+            </part>
+            <part>
+              <text hooks="math"><![CDATA[
+The abstract syntax for values is defined as follows:
+\begin{eqnarray}
+value %v & ::= & %c %v %v \\
+             & | & %c \\
+             & | & %n
+\end{eqnarray}
+              ]]></text>    
+              <text hooks="math"><![CDATA[
+Implement a function <code>evaluate(m, env, e)</code> that takes a module <code>m</code>, an environment <code>env</code>, and an <i>expression</i> abstract syntax tree <code>e</code> as its three arguments. The function should return the value that corresponds to the evaluation of the abstract syntax tree <code>e</code>, as determined by the operational semantics presented below. Note that the <span style="font-variant:small-caps;">[Expression-Apply]</span> requires using a unification algorithm to obtain a substitution \sigma that unifies %p and %v_1.
+              ]]></text>
+              <inferences hooks="math">
+                <inference title="Expression-Constructor-Args">
+                  <premises><![CDATA[%M, \Sigma, %e_1 \Downarrow %v_1 %~ %~ %M, \Sigma, %e_2 \Downarrow %v_2]]></premises>
+                  <conclusion><![CDATA[%M, \Sigma, %c %e_1 %e_2 \Downarrow %c %v_1 %v_2]]></conclusion>
+                </inference>
+                <inference title="Expression-Constructor-No-Args">
+                  <premises><![CDATA[]]></premises>
+                  <conclusion><![CDATA[%M, \Sigma, %c \Downarrow %c]]></conclusion>
+                </inference>
+                <inference title="Expression-Number">
+                  <premises><![CDATA[]]></premises>
+                  <conclusion><![CDATA[%M, \Sigma, %n \Downarrow %n]]></conclusion>
+                </inference>
+                <inference title="Expression-Variable">
+                  <premises><![CDATA[\Sigma(%x) = %v]]></premises>
+                  <conclusion><![CDATA[%M, \Sigma, %x \Downarrow %v]]></conclusion>
+                </inference>
+                <inference title="Expression-Mult">
+                  <premises><![CDATA[%M, \Sigma, %e_1 \Downarrow %n_1 %~ %~ %M, \Sigma, %e_2 \Downarrow %n_2]]></premises>
+                  <conclusion><![CDATA[%M, \Sigma, %e_1 <b>*</b> %e_2 \Downarrow %n_1 \cdot %n_2]]></conclusion>
+                </inference>
+                <inference title="Expression-Apply">
+                  <premises><![CDATA[
+                    %M, \Sigma, %e_1 \Downarrow %v_1
+                    %~ %~ (%p, %e_2) \in %M(%f)
+                    %~ %~ \sigma(%p) = \sigma(%v_1)
+                    %~ %~ %M, \Sigma \uplus \sigma, %e_2 \Downarrow %v_2
+                  ]]></premises>
+                  <conclusion><![CDATA[
+                    %M, \Sigma , %f <b>(</b> %e_1 <b>)</b> \Downarrow %v_2
+                  ]]></conclusion>
+                </inference>
+              </inferences>
+            </part>
+          </parts>
+          <text><![CDATA[
+Once <code>build()</code> and <code>evaluate()</code> are implemented, you can use the <code>interact()</code> function in <code><a href="hw4/interpret.py">hw4/interpret.py</a></code> to query modules.
+          ]]></text>
+        </problem>
+        <problem>
+          <text><![CDATA[
+In this problem you will practice using algebraic data types in the Haskell programming language. All your definitions should be included in the file <code><a href="hw4/Tree.hs">hw4/Tree.hs</a></code>. You will be working with the following data type definition, which has already been included in the file:
+          ]]></text>
+          <code hooks="Haskell"><![CDATA[
+@data Tree = Leaf | Twig | Branch Tree Tree Tree
+          ]]></code>
+          <text><![CDATA[
+You may not import any additional modules or libraries.
+          ]]></text>
+          <parts>
+            <part>
+              <text><![CDATA[
+Modify the data type definition for <code>Tree</code> in <code>Tree.hs</code> so that the functions <code>(==)</code> and <code>show</code> are automatically generated for this data type.
+              ]]></text>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>twigs :: Tree -> Integer</code> that returns an integer representing the total number of <code>Twig</code> values in the input tree.
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> twigs (Branch (Branch Twig Leaf Leaf) Twig Twig)
+3
+              ]]></code>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>branches :: Tree -> Integer</code> that returns an integer representing the total number of branches in the input tree.
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> branches (Branch Leaf (Branch Twig Leaf Leaf) Leaf)
+2
+              ]]></code>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement a function <code>width :: Tree -> Integer</code> that returns an integer representing the width of the input tree. Trees consisting of a <code>Leaf</code> or <code>Twig</code> are defined to have a width of <code>1</code>; all other trees are as wide as the sum of the widths of their children.
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> width (Branch (Branch Leaf Leaf Twig) (Branch Leaf Leaf Leaf) Leaf)
+7
+              ]]></code>
+            </part>
+            <part>
+              <text><![CDATA[
+A tree is <i>perfect</i> if all the leaves of the tree are at the same depth and it has no twigs. Define a function <code>perfect :: Tree -> Bool</code> that returns <code>True</code> if the input tree is perfect and <code>False</code> otherwise.
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> perfect (Branch (Branch Leaf Leaf Leaf) Leaf Leaf)
+False
+*> perfect (Branch Twig Twig Twig)
+False
+*> perfect (Branch (Branch Leaf Leaf Leaf) (Branch Leaf Leaf Leaf) (Branch Leaf Leaf Leaf))
+True
+              ]]></code>
+            </part>
+            <part>
+              <text><![CDATA[
+A tree is <i>degenerate</i> if all the branches are part of a single path. Equivalently, a tree is degenerate if all nodes have at <b style="color:green;">least two non-node children</b>. Define a function <code>degenerate :: Tree -> Bool</code> that returns <code>True</code> if the tree supplied is degenerate, and <code>False</code> otherwise.
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> degenerate (Branch (Branch Twig Leaf Leaf) Twig Leaf)
+True
+*> degenerate (Branch (Branch Leaf Leaf Leaf) Leaf (Branch Leaf Leaf Leaf))
+False
+              ]]></code>
+            </part>
+            <part>
+              <text><![CDATA[
+Define a tree <code>infinite :: Tree</code> that is infinitely large, but in which every branch has a left <code>Leaf</code> child, a right <code>Leaf</code> child, and a <code>Branch</code> middle child.
+              ]]></text>
+            </part>
+          </parts>
+        </problem>
+        <problem>
+          <text><![CDATA[
+In this problem you will implement a very simple interpreter using the Haskell programming language. All your definitions should be included in the file <code><a href="hw4/Interpret.hs">hw4/Interpret.hs</a></code>.
+          ]]></text>
+          <parts>
+            <part>
+              <text><![CDATA[
+Implement the <code>evaluate :: Term -> Value</code> function so that it evaluates abstract syntax trees of the type <code>Term</code> to obtain values (i.e., integers).
+              ]]></text>
+              <code hooks="Haskell"><![CDATA[
+*> evaluate (Plus (Number 1) (Number 2))
+3
+*> evaluate (Mult (Number 4) (Max (Number 3) (Plus (Number (-1)) (Number (-2)))))
+12
+              ]]></code>
+            </part>
+            <part>
+              <text><![CDATA[
+Implement the <code>execute :: Stmt -> Output</code> function so that it executes abstract syntax trees of the type <code>Stmt</code> to obtain an <a href="#db57dc0684174cd097ebf73d733dc9bc">output</a>.
+              ]]></text>
+            </part>
+          </parts>
+        </problem>
+      </problems>
+    </assignment>
+  </section>
+</sheaf>

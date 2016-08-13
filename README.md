@@ -1,2 +1,3 @@
 # course-programming-languages
-Lectures and course materials for a course on programming language concepts and theory, interpretation and compilation, and programming paradigms.
+
+Lecture notes, assignments, and other materials for a one-semester course on programming language concepts and theory, interpretation and compilation, and programming paradigms.
