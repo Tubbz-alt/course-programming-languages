@@ -34,7 +34,7 @@ Implement a function <code>subst(s, a)</code> that takes two arguments: a substi
               <text><![CDATA[
 Implement a function <code>unify(a, b)</code> that takes two arguments: two syntax trees <code>a</code> and <code>b</code>. The function should return the smallest substitution <code>s</code> that satisfies the following equation:
               ]]></text>
-              <code hooks="Python"><![CDATA[
+              <code class="py"><![CDATA[
 subst(s, a) == subst(s, b)
               ]]></code>
               <text><![CDATA[
@@ -152,8 +152,8 @@ Once <code>build()</code> and <code>evaluate()</code> are implemented, you can u
           <text><![CDATA[
 In this problem you will practice using algebraic data types in the Haskell programming language. All your definitions should be included in the file <code><a href="hw4/Tree.hs">hw4/Tree.hs</a></code>. You will be working with the following data type definition, which has already been included in the file:
           ]]></text>
-          <code hooks="Haskell"><![CDATA[
-@data Tree = Leaf | Twig | Branch Tree Tree Tree
+          <code class="haskell"><![CDATA[
+data Tree = Leaf | Twig | Branch Tree Tree Tree
           ]]></code>
           <text><![CDATA[
 You may not import any additional modules or libraries.
@@ -168,7 +168,7 @@ Modify the data type definition for <code>Tree</code> in <code>Tree.hs</code> so
               <text><![CDATA[
 Implement a function <code>twigs :: Tree -> Integer</code> that returns an integer representing the total number of <code>Twig</code> values in the input tree.
               ]]></text>
-              <code hooks="Haskell"><![CDATA[
+              <code class="haskell"><![CDATA[
 *> twigs (Branch (Branch Twig Leaf Leaf) Twig Twig)
 3
               ]]></code>
@@ -177,7 +177,7 @@ Implement a function <code>twigs :: Tree -> Integer</code> that returns an integ
               <text><![CDATA[
 Implement a function <code>branches :: Tree -> Integer</code> that returns an integer representing the total number of branches in the input tree.
               ]]></text>
-              <code hooks="Haskell"><![CDATA[
+              <code class="haskell"><![CDATA[
 *> branches (Branch Leaf (Branch Twig Leaf Leaf) Leaf)
 2
               ]]></code>
@@ -186,7 +186,7 @@ Implement a function <code>branches :: Tree -> Integer</code> that returns an in
               <text><![CDATA[
 Implement a function <code>width :: Tree -> Integer</code> that returns an integer representing the width of the input tree. Trees consisting of a <code>Leaf</code> or <code>Twig</code> are defined to have a width of <code>1</code>; all other trees are as wide as the sum of the widths of their children.
               ]]></text>
-              <code hooks="Haskell"><![CDATA[
+              <code class="haskell"><![CDATA[
 *> width (Branch (Branch Leaf Leaf Twig) (Branch Leaf Leaf Leaf) Leaf)
 7
               ]]></code>
@@ -195,7 +195,7 @@ Implement a function <code>width :: Tree -> Integer</code> that returns an integ
               <text><![CDATA[
 A tree is <i>perfect</i> if all the leaves of the tree are at the same depth and it has no twigs. Define a function <code>perfect :: Tree -> Bool</code> that returns <code>True</code> if the input tree is perfect and <code>False</code> otherwise.
               ]]></text>
-              <code hooks="Haskell"><![CDATA[
+              <code class="haskell"><![CDATA[
 *> perfect (Branch (Branch Leaf Leaf Leaf) Leaf Leaf)
 False
 *> perfect (Branch Twig Twig Twig)
@@ -208,7 +208,7 @@ True
               <text><![CDATA[
 A tree is <i>degenerate</i> if all the branches are part of a single path. Equivalently, a tree is degenerate if all nodes have at <b style="color:green;">least two non-node children</b>. Define a function <code>degenerate :: Tree -> Bool</code> that returns <code>True</code> if the tree supplied is degenerate, and <code>False</code> otherwise.
               ]]></text>
-              <code hooks="Haskell"><![CDATA[
+              <code class="haskell"><![CDATA[
 *> degenerate (Branch (Branch Twig Leaf Leaf) Twig Leaf)
 True
 *> degenerate (Branch (Branch Leaf Leaf Leaf) Leaf (Branch Leaf Leaf Leaf))
@@ -231,7 +231,7 @@ In this problem you will implement a very simple interpreter using the Haskell p
               <text><![CDATA[
 Implement the <code>evaluate :: Term -> Value</code> function so that it evaluates abstract syntax trees of the type <code>Term</code> to obtain values (i.e., integers).
               ]]></text>
-              <code hooks="Haskell"><![CDATA[
+              <code class="haskell"><![CDATA[
 *> evaluate (Plus (Number 1) (Number 2))
 3
 *> evaluate (Mult (Number 4) (Max (Number 3) (Plus (Number (-1)) (Number (-2)))))

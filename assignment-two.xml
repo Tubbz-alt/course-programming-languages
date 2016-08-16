@@ -68,12 +68,12 @@ Implement a parser <code>program()</code> that can parse token sequences that co
 \end{eqnarray}
 Recall that the last <i>program</i> subtree in each of the choices in the production defining <i>program</i> represents the <i>rest</i> of the program. For example, in the choice "<b>if</b> <i>expression</i> <b>{</b> <i>program</i> <b>}</b> <i>program</i>", the first <i>program</i> subtree is the body of the <b>if</b> statement, while the second <i>program</i> subtree is the rest of the program. For another example, the following is one possible program in this language:
               ]]></text>  
-              <code hooks="Python">
+              <code><![CDATA[
 if true {
   print true;
 }
 print true;
-              </code>
+              ]]></code>
             </part>
           </parts>
         </problem>
