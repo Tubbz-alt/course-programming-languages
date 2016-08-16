@@ -404,7 +404,7 @@ def tokenize(s):
         <text><![CDATA[
 Below is an example input and output.
         ]]></text>
-        <![CDATA[<code class="py">
+        <code class="py"><![CDATA[
 >>> tokenize("and (or (and (true, false), not(false)), or (true, false))")
 
 ['and', '(', 'or', '(', 'and', '(', 'true', ',', 'false', ')', ',', 'not', 
