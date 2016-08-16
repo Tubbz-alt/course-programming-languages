@@ -1,4 +1,4 @@
-<sheaf title="BU CAS CS 320 Fall 2015">
+<sheaf title="Concepts of Programming Languages" authors="Andrei Lapets">
   <section title="Introduction, Background, and Motivation">
     <subsection title="Overview">
       <text><![CDATA[
@@ -155,14 +155,14 @@ In the Python programming language, the <code>re</code> module provides function
         <paragraph><![CDATA[
 If a match succeeds, a match object is returned that contains additional information (e.g., the position of the match); otherwise, <code>None</code> is returned.
         ]]></paragraph>
-        <code hooks="Python"><![CDATA[
->>> @import re
+        <code class="py"><![CDATA[
+>>> import re
 
 >>> re.match(r"^(a|b|c)$", "a")   # Succeeds.
 <_sre.SRE_Match object; span=(0, 1), match='a'>
 
 >>> re.match(r"^(a|b|c)$", "def") # Fails.
-@None
+None
 
 >>> re.match(r"^((red|green|blue)+)$", "redgreenblueredblue")
 <_sre.SRE_Match object; span=(0, 19), match='redgreenblueredblue'>
@@ -171,7 +171,7 @@ If a match succeeds, a match object is returned that contains additional informa
 <_sre.SRE_Match object; span=(0, 19), match='redgreenblueredblue'>
 
 >>> re.match(r"^([a-zA-Z0-9]+)$", "!@#$")
-@None
+None
         ]]></code>   
       </example>
       <fact required="true" hooks="math" id="174fccbd604846ad92d764daf2393aa3">
@@ -340,9 +340,9 @@ The following is the new grammar definition for this language.
     </subsection>
   </section>
   <section title="Parsing">
-    <text>
+    <text><![CDATA[
 Given a programming language definition, we want to have the ability to operate on programs written in that language using a computer. To do so, we need to convert the character string representations of programs in that programming language into instances of a data structure; each data structure instance would then be a representation of the program as data.
-    </text>
+    ]]></text>
     <subsection title="Concrete and abstract syntaxes">
       <definition required="true" id="e601deb568ed46a1a1d741907a6dcfa9"><![CDATA[
 Given an alphabet, token set, and grammar definition (e.g., represented using BNF notation), we define the <i>concrete syntax</i> to be the set of all character strings that conform to the grammar definition. We call a particular character string that conforms to the grammar definition a <i>concrete syntax instance</i>.
@@ -359,13 +359,13 @@ Consider again the language that conforms to the following grammar:
 \end{eqnarray}
 The following is the character string of one possible program in the language. This character string is an instance of the concrete syntax of the language.
         ]]></text>
-        <code hooks="Python">
+        <code class="py"><![CDATA[
 and (or (and (true, false), not(false)), or (true, false))
-        </code>
-        <text>
+        ]]></code>
+        <text><![CDATA[
 The above character string might be converted into a structured representation of the program within some host language (i.e., the programming language being used to operate on these programs: checking for errors, interpreting, or compiling the program). Below, we present one possible Python representation of the instance of the abstract syntax (i.e., the parse tree) corresponding to the concrete syntax instance above. This representation uses nested Python dictionaries to represent the parse tree, with strings being used to represent node labels and leaves.
-        </text>
-        <code hooks="Python">
+        ]]></text>
+        <code class="py"><![CDATA[
 { "And": [
     { "Or": [
         { "And": ["True","False"]}, 
@@ -375,7 +375,7 @@ The above character string might be converted into a structured representation o
     { "Or": ["True","False"]}
   ]
 }
-        </code>
+        ]]></code>
       </example>
     </subsection>
     <subsection title="Lexing (a.k.a., tokenizing) and parsing">
@@ -391,25 +391,25 @@ Consider again the language that conforms to the following grammar:
 \end{eqnarray}
 The following Python implementation of a tokenizing algorithm for this language uses regular expressions to split a character string into a sequence of individual tokens from the token set.
         ]]></text>
-        <code hooks="Python">
-@import re
-@def tokenize(s):
+        <code class="py"><![CDATA[
+import re
+def tokenize(s):
     # Use a regular expression to split the string into
     # tokens or sequences of zero or more spaces.
-    tokens = [t @for t @in re.split(r"(\s+|true|false|and|or|not|,|\(|\))", s)]
+    tokens = [t for t in re.split(r"(\s+|true|false|and|or|not|,|\(|\))", s)]
 
     # Throw out the spaces and return the result.
-    @return [t @for t @in tokens @if @not t.isspace() @and @not t == ""]
-        </code>
-        <text>
+    return [t for t in tokens if not t.isspace() and not t == ""]
+        ]]></code>
+        <text><![CDATA[
 Below is an example input and output.
-        </text>
-        <code hooks="Python">
+        ]]></text>
+        <code class="py"><![CDATA[
 >>> tokenize("and (or (and (true, false), not(false)), or (true, false))")
 
 ['and', '(', 'or', '(', 'and', '(', 'true', ',', 'false', ')', ',', 'not', 
  '(', 'false', ')', ')', ',', 'or', '(', 'true', ',', 'false', ')', ')']
-        </code>
+        ]]></code>
       </example>
       <definition required="true" id="3c944fff48f246aba9409f76e48ccef4"><![CDATA[
 A <i>parser</i> is an algorithm that converts a token sequence into an instance of the abstract syntax (i.e., a parse tree).
@@ -463,9 +463,9 @@ The BNF representation of a grammar can be converted into a parsing algorithm th
       <fact required="true" id="47254608df414ace8d04c630a2b15689"><![CDATA[
 Given a BNF representation of a grammar, if for every production in the grammar, each choice begins with a unique terminal (i.e., a terminal that is <i>not</i> the first terminal in any other choice within that production), then we say the grammar is in <i>LL(1)</i> form, and we can implement a <i>predictive recursive descent</i> parsing algorithm to parse any token sequence that conforms to this grammar (note that these are only <i>sufficient</i> conditions for the grammar to be in LL(1) form; less restrictive conditions also exist).
       ]]></fact>
-      <text>
+      <text><![CDATA[
 A predictive recursive descent parser can effectively run in linear time; it decomposes the token sequence from left to right while assembling a parse tree.
-      </text>
+      ]]></text>
       <example required="true" id="2cd418f2876c42d59a57e34bd6288f22">
         <text hooks="math"><![CDATA[
 Consider again the language that conforms to the following grammar:
@@ -475,44 +475,44 @@ Consider again the language that conforms to the following grammar:
 \end{eqnarray}
 The following Python implementation of a predictive recursive descent parsing algorithm for this language builds a parse tree using the nested dictionary representation seen in <a href="#4ba33545333f48e88baddfa4507a1db0">a previous example</a>. This recursive algorithm takes a single argument: a sequence of tokens. It returns two results: a parse tree, and the remainder of the token sequence. <b>Note that the order in which the choices in the production are being handled is not determined by the order of the choices in the production.</b> The choices in a production are unordered; any parser implementation that captures all the possible choices conforms to the grammar definition.
         ]]></text>
-        <code hooks="Python">
-@def parse(tokens):
-    @if tokens[0] == 'true':
-        @return ('True', tokens[1:])
+        <code class="py"><![CDATA[
+def parse(tokens):
+    if tokens[0] == 'true':
+        return ('True', tokens[1:])
 
-    @if tokens[0] == 'false':
-        @return ('False', tokens[1:])
+    if tokens[0] == 'false':
+        return ('False', tokens[1:])
 
-    @if tokens[0] == 'not' @and tokens[1] == '(':
+    if tokens[0] == 'not' and tokens[1] == '(':
         (e1, tokens) = parse(tokens[2:])
-        @if tokens[0] == ')':
-          @return ({'Not':[e1]}, tokens[1:])
+        if tokens[0] == ')':
+          return ({'Not':[e1]}, tokens[1:])
 
-    @if tokens[0] == 'or' @and tokens[1] == '(':
+    if tokens[0] == 'or' and tokens[1] == '(':
         (e1, tokens) = parse(tokens[2:])
-        @if tokens[0] == ',':
+        if tokens[0] == ',':
             (e2, tokens) = parse(tokens[1:])
-            @if tokens[0] == ')':
-                @return ({'Or':[e1,e2]}, tokens[1:])
+            if tokens[0] == ')':
+                return ({'Or':[e1,e2]}, tokens[1:])
 
-    @if tokens[0] == 'and' @and tokens[1] == '(':
+    if tokens[0] == 'and' and tokens[1] == '(':
         (e1, tokens) = parse(tokens[2:])
-        @if tokens[0] == ',':
+        if tokens[0] == ',':
             (e2, tokens) = parse(tokens[1:])
-            @if tokens[0] == ')':
-                @return ({'And':[e1,e2]}, tokens[1:])
-        </code>
-        <text>
+            if tokens[0] == ')':
+                return ({'And':[e1,e2]}, tokens[1:])
+        ]]></code>
+        <text><![CDATA[
 Below is an example input and output. Notice that no tokens are left in the token sequence once the result is returned.
-        </text>
-        <code hooks="Python">
->>> @import json
+        ]]></text>
+        <code class="py"><![CDATA[
+>>> import json
 >>> (tree, tokens) =\
       parse(tokenize(\
         "and (or (and (true, false), not(false)), or (true, false))"\
         )\
       )
->>> @print(json.dumps(tree, sort_keys=True, indent=2))
+>>> print(json.dumps(tree, sort_keys=True, indent=2))
 {
   "And": [
     {
@@ -538,9 +538,9 @@ Below is an example input and output. Notice that no tokens are left in the toke
     }
   ]
 }
->>> @print(tokens)
+>>> print(tokens)
 []
-        </code>
+        ]]></code>
       </example>
       <fact required="true" id="95cb72f5b4d24ddba2c8081c7b42618a"><![CDATA[
 If we relax the conditions on the grammar definition that make it LL(1) by dropping the requirement that the first terminal in each sequence within a production must be unique, we can no longer use predictive recursive descent parsing algorithm to parse a language corresponding to this grammar because the first terminal in each sequence within a production no longer uniquely determines which choice within a production should be used to continue parsing a token sequence. However, as long as every sequence within every production starts with a terminal, we can implement a <i>backtracking recursive descent</i> parsing algorithm to parse token sequence in the language.
@@ -554,68 +554,68 @@ In the previus example, the grammar only allowed prefix logical operators. Suppo
 \end{eqnarray}
 It is no longer possible to implement a predictive recursive descent parser. We must instead employ backtracking, and we must also keep track of whether we have consumed all the tokens.
         ]]></text>
-        <code hooks="Python">
-@def parse(tmp, top = @True):
+        <code class="py"><![CDATA[
+def parse(tmp, top = True):
     tokens = tmp[0:]
-    @if tokens[0] == 'true':
+    if tokens[0] == 'true':
         tokens = tokens[1:]
-        @if @not top @or @len(tokens) == 0:
-            @return ('True', tokens)
+        if not top or len(tokens) == 0:
+            return ('True', tokens)
 
     tokens = tmp[0:]
-    @if tokens[0] == 'false':
+    if tokens[0] == 'false':
         tokens = tokens[1:]
-        @if @not top @or @len(tokens) == 0:
-            @return ('False', tokens)
+        if not top or len(tokens) == 0:
+            return ('False', tokens)
 
     tokens = tmp[0:]
-    @if tokens[0] == 'not' @and tokens[1] == '(':
+    if tokens[0] == 'not' and tokens[1] == '(':
         tokens = tokens[2:]
-        r = parse(tokens, @False)
-        @if @not r @is @None:
+        r = parse(tokens, False)
+        if not r is None:
             (e1, tokens) = r
-            @if tokens[0] == ')':
+            if tokens[0] == ')':
                 tokens = tokens[1:]
-                if @not top @or @len(tokens) == 0:
-                    @return ({'Not':[e1]}, tokens)
+                if not top or len(tokens) == 0:
+                    return ({'Not':[e1]}, tokens)
 
     tokens = tmp[0:]
-    @if tokens[0] == '(':
+    if tokens[0] == '(':
         tokens = tokens[1:]
-        r = parse(tokens, @False)
-        @if @not r @is @None:
+        r = parse(tokens, False)
+        if not r is None:
             (e1, tokens) = r
-            @if tokens[0] == 'or':
+            if tokens[0] == 'or':
                 tokens = tokens[1:]
-                r = parse(tokens, @False)
-                @if @not r @is @None:
+                r = parse(tokens, False)
+                if not r is None:
                     (e2, tokens) = r
-                    @if tokens[0] == ')':
+                    if tokens[0] == ')':
                         tokens = tokens[1:]
-                        @if @not top @or @len(tokens) == 0:
-                            @return ({'Or':[e1,e2]}, tokens)
+                        if not top or len(tokens) == 0:
+                            return ({'Or':[e1,e2]}, tokens)
 
     tokens = tmp[0:]
-    @if tokens[0] == '(':
+    if tokens[0] == '(':
         tokens = tokens[1:]
-        r = parse(tokens, @False)
-        @if @not r @is @None:
+        r = parse(tokens, False)
+        if not r is None:
             (e1, tokens) = r
-            @if tokens[0] == 'and':
+            if tokens[0] == 'and':
                 tokens = tokens[1:]
-                r = parse(tokens, @False)
-                @if @not r @is @None:
+                r = parse(tokens, False)
+                if not r is None:
                     (e2, tokens) = r
-                    @if tokens[0] == ')':
+                    if tokens[0] == ')':
                         tokens = tokens[1:]
-                        @if @not top @or @len(tokens) == 0:
-                            @return ({'And':[e1,e2]}, tokens)
-        </code>
-        <text>
+                        if not top or len(tokens) == 0:
+                            return ({'And':[e1,e2]}, tokens)
+        ]]></code>
+        <text><![CDATA[
 The above code is far too repetitive. However, we can take the parts that repeat and turn them into a loop body that loops over all the possible choices in the production.
-        </text>
-        <code hooks="Python">
-@def parse(tmp, top = @True):
+        ]]></text>
+        <code class="py"><![CDATA[
+def parse(tmp, top = True):
     seqs = [\
         ('True', ['true']), \
         ('False', ['false']), \
@@ -625,7 +625,7 @@ The above code is far too repetitive. However, we can take the parts that repeat
         ]
 
     # Try each choice sequence.
-    @for (label, seq) @in seqs:
+    for (label, seq) in seqs:
         tokens = tmp[0:]
         ss = [] # To store matched terminals.
         es = [] # To collect parse trees from recursive calls.
@@ -635,29 +635,29 @@ The above code is far too repetitive. However, we can take the parts that repeat
         # recursive calls depending on whether
         # the sequence entry is a terminal or
         # parsing function.
-        @for x @in seq:
-            @if @type(x) == @type(""): # Terminal.
+        for x in seq:
+            if type(x) == type(""): # Terminal.
 
-                @if tokens[0] == x: # Does terminal match token?
+                if tokens[0] == x: # Does terminal match token?
                     tokens = tokens[1:]
                     ss = ss + [x]
-                @else:
-                    @break # Terminal did not match token.
+                else:
+                    break # Terminal did not match token.
 
-            @else: # Parsing function.
+            else: # Parsing function.
 
                 # Call parsing function recursively
-                r = x(tokens, @False) 
-                @if @not r @is @None:
+                r = x(tokens, False) 
+                if not r is None:
                     (e, tokens) = r
                     es = es + [e]
 
         # Check that we got either a matched token
         # or a parse tree for each sequence entry.
-        @if @len(ss) + @len(es) == @len(seq):
-            @if @not top @or @len(tokens) == 0:
-                @return ({label:es} @if @len(es) > 0 @else label, tokens)
-        </code>
+        if len(ss) + len(es) == len(seq):
+            if not top or len(tokens) == 0:
+                return ({label:es} if len(es) > 0 else label, tokens)
+        ]]></code>
       </example>
     </subsection>
     <subsection title="More parsing examples and building parsers for other classes of grammar">
@@ -681,8 +681,8 @@ Consider the following grammar definition:
 \end{eqnarray}
 Suppose we want to implement a parser for the above grammar. A partial implementation of a parser for the above grammar (what has been presented in lecture so far) is provided below.
         ]]></text>
-        <code hooks="Python">
-@def command(tokens, top = @True):
+        <code class="py"><![CDATA[
+def command(tokens, top = True):
     seqs = {\
        ("Start", "start"),\
        ("Suspend", "suspend"),\
@@ -690,48 +690,48 @@ Suppose we want to implement a parser for the above grammar. A partial implement
        ("Terminate", "terminate"),\
        ("Reboot", "reboot")\
        }
-    @for (key, value) @in seqs:
-        @if tokens[0] == value:
+    for (key, value) in seqs:
+        if tokens[0] == value:
             tokens = tokens[1:]
-            @if @not top @or @len(tokens) == 0:
-                @return (key, tokens)
+            if not top or len(tokens) == 0:
+                return (key, tokens)
     
-    @if tokens[0] == 'repeat':
-        r = command(tokens[1:], @False)
-        @if @not r @is @None:
+    if tokens[0] == 'repeat':
+        r = command(tokens[1:], False)
+        if not r is None:
             (e, tokens) = r
-            @if @not top @or @len(tokens) == 0:
-                @return ({"Repeat": [e]}, tokens)
+            if not top or len(tokens) == 0:
+                return ({"Repeat": [e]}, tokens)
 
-    @if tokens[0] == 'while':
-        r = condition(tokens[1:], @False)
-        @if @not r @is @None:
+    if tokens[0] == 'while':
+        r = condition(tokens[1:], False)
+        if not r is None:
             (e1, tokens) = r
-            @if tokens[0] == 'then':
-                 r = command(tokens[1:], @False)
-                 @if @not r @is @None:
+            if tokens[0] == 'then':
+                 r = command(tokens[1:], False)
+                 if not r is None:
                      (e2, tokens) = r           
-                     @if @not top @or @len(tokens) == 0:
-                         @return ({"While": [e1,e2]}, tokens)
+                     if not top or len(tokens) == 0:
+                         return ({"While": [e1,e2]}, tokens)
 
-@def condition(tokens, top = True):
+def condition(tokens, top = True):
     seqs = [\
        ("PowerLow", ["power", "low"]),\
        ("TempHigh", ["temperature", "high"]),\
        ("UserInput", ["user", "input"])\
        ]
-    @for (key, seq) @in seqs:
-        @if tokens[0] == seq[0]:
-            @if tokens[1] == seq[1]:
+    for (key, seq) in seqs:
+        if tokens[0] == seq[0]:
+            if tokens[1] == seq[1]:
                 tokens = tokens[2:]
-                @if @not top @or @len(tokens) == 0:
-                    @return (key, tokens)
-        </code>
-          <text><![CDATA[
+                if not top or len(tokens) == 0:
+                    return (key, tokens)
+        ]]></code>
+        <text><![CDATA[
 It is possible to replace the <code>condition()</code> function with a generic parser for base cases that contain an arbitrary number of terminals in each sequence.
 Any call to <code>condition(...)</code> can then be replaced with a call to <code>parseBaseCases(seqsCondition, ...)</code>.
-          ]]></text>
-        <code hooks="Python">
+        ]]></text>
+        <code class="py"><![CDATA[
 seqsCondition = [\
        ("PowerLow", ["power", "low"]),\
        ("TempHigh", ["temperature", "high"]),\
@@ -739,23 +739,23 @@ seqsCondition = [\
        ("UserInput", ["user", "input"])\
        ]
 
-@def parseBaseCases(seqs, tokens, top = @True):
-    @for (key, seq) @in seqs:
+def parseBaseCases(seqs, tokens, top = True):
+    for (key, seq) in seqs:
          # Check if token sequence matches sequence.
         i = 0
-        @for terminal @in seq:
-            @if terminal == tokens[i]:
-                @pass
-            @else:
-                @break
+        for terminal in seq:
+            if terminal == tokens[i]:
+                pass
+            else:
+                break
             i = i + 1
                 
         # Check if the previous loop succeeded.
-        @if i == @len(seq):
-            tokens = tokens[@len(seq):]
-            if @not top @or @len(tokens) == 0:
-                @return (key, tokens)
-        </code>
+        if i == len(seq):
+            tokens = tokens[len(seq):]
+            if not top or len(tokens) == 0:
+                return (key, tokens)
+        ]]></code>
       </exercise>
       <example required="true" id="b1e8bae08f134922b2bdc85fd206cbe4">
         <text hooks="math"><![CDATA[ 
@@ -770,21 +770,21 @@ Consider the following grammar definition:
 \end{eqnarray}
 Implementing a naive recursive descent parser, predictive or backtracking, would not work for this grammar. Consider what would happen if we ran the following code on any input:
         ]]></text>
-        <code hooks="Python"><![CDATA[ 
-@def parse(tokens):
-    @if tokens[0] == 'true':
-        @return ('True', tokens[1:])
+        <code class="py"><![CDATA[ 
+def parse(tokens):
+    if tokens[0] == 'true':
+        return ('True', tokens[1:])
 
-    @if tokens[0] == 'false':
-        @return ('False', tokens[1:])
+    if tokens[0] == 'false':
+        return ('False', tokens[1:])
 
     # ...
 
     # Recursive call, but no tokens consumed.
     (e1, tokens) = parse(tokens) 
-      @if tokens[0] == 'and':
+      if tokens[0] == 'and':
         (e2, tokens) = parse(tokens[1:])
-        @return ({'And':[e1,e2]}, tokens[1:])
+        return ({'And':[e1,e2]}, tokens[1:])
 
     # ...
         ]]></code>
@@ -802,22 +802,22 @@ To get around this problem, one option is to perform <i>left-recursion eliminati
 \end{eqnarray}
 The above is usually acceptable if the operator, such as <b>and</b>, is commutative or right-associative. However, if the operator is left-associative, the above strategy would not necessarily lead to a correct parse tree. Can you explain why? In such a scenario, other techniques would need to be employed. If the operator is indeed associative or right-associative, however, the parser implementation could then look something like the following:
         ]]></text>
-        <code hooks="Python"><![CDATA[ 
-@def formula(tmp):
+        <code class="py"><![CDATA[ 
+def formula(tmp):
     tokens = tmp[0:]
     (e1, tokens) = left(tokens)
-      @if tokens[0] == 'and':
+      if tokens[0] == 'and':
         (e2, tokens) = formula(tokens[1:])
-        @return ({'And':[e1,e2]}, tokens[1:])
+        return ({'And':[e1,e2]}, tokens[1:])
 
     # ...
 
-@def left(tokens):
-    @if tokens[0] == 'true':
-        @return ('True', tokens[1:])
+def left(tokens):
+    if tokens[0] == 'true':
+        return ('True', tokens[1:])
 
-    @if tokens[0] == 'false':
-        @return ('False', tokens[1:])
+    if tokens[0] == 'false':
+        return ('False', tokens[1:])
 
     # ...
         ]]></code>
@@ -1027,35 +1027,35 @@ The definition then becomes more concise.
         <text hooks="math"><![CDATA[
 We can convert the above operational semantics inference rules into a Python implementation of an interpreter for this simple language. The functions <code>vnot</code>, <code>vand</code>, and <code>vor</code> correspond to \neg, \wedge, and \vee, respectively, in the operational semantics.
         ]]></text>
-        <code hooks="Python">
-@def vnot(v):
-    @if v == 'True':  @return 'False'
-    @if v == 'False': @return 'True'
+        <code class="py"><![CDATA[
+def vnot(v):
+    if v == 'True':  return 'False'
+    if v == 'False': return 'True'
 
-@def vand(v1, v2):
-    if v1 == 'True'  @and v2 == 'True':  @return 'True'
-    if v1 == 'True'  @and v2 == 'False': @return 'False'
-    if v1 == 'False' @and v2 == 'True':  @return 'False'
-    if v1 == 'False' @and v2 == 'False': @return 'False'
+def vand(v1, v2):
+    if v1 == 'True'  and v2 == 'True':  return 'True'
+    if v1 == 'True'  and v2 == 'False': return 'False'
+    if v1 == 'False' and v2 == 'True':  return 'False'
+    if v1 == 'False' and v2 == 'False': return 'False'
 
-@def vor(v1, v2):
-    @if v1 == 'True'  @and v2 == 'True':  @return 'True'
-    @if v1 == 'True'  @and v2 == 'False': @return 'True'
-    @if v1 == 'False' @and v2 == 'True':  @return 'True'
-    @if v1 == 'False' @and v2 == 'False': @return 'False'
+def vor(v1, v2):
+    if v1 == 'True'  and v2 == 'True':  return 'True'
+    if v1 == 'True'  and v2 == 'False': return 'True'
+    if v1 == 'False' and v2 == 'True':  return 'True'
+    if v1 == 'False' and v2 == 'False': return 'False'
 
-Node = @dict
-Leaf = @str
+Node = dict
+Leaf = str
 
-@def evaluate(e):
-    @if @type(e) == Node:
-        @for label @in e:
+def evaluate(e):
+    if type(e) == Node:
+        for label in e:
             children = e[label]
-            @if label == 'Not':
+            if label == 'Not':
                 f = children[0]
                 v = evaluate(f)
-                @return vnot(v)
-            @elif label == 'And':
+                return vnot(v)
+            elif label == 'And':
                 # Notice that we can make the recursive calls
                 # below in any order we like; the order of the
                 # calls is not specified by the operational
@@ -1064,49 +1064,49 @@ Leaf = @str
                 v1 = evaluate(f1)
                 f2 = children[1]
                 v2 = evaluate(f2)
-                @return vand(v1, v2)
-            @elif label == 'Or':
+                return vand(v1, v2)
+            elif label == 'Or':
                 f2 = children[1]
                 v2 = evaluate(f2)
                 f1 = children[0]
                 v1 = evaluate(f1)
-                @return vor(v1, v2)
-    @elif @type(e) == Leaf:
-        @if e == 'True':
-            @return 'True'
-        @if e == 'False':
-            @return 'False'
-        </code>
+                return vor(v1, v2)
+    elif type(e) == Leaf:
+        if e == 'True':
+            return 'True'
+        if e == 'False':
+            return 'False'
+        ]]></code>
         <text hooks="math"><![CDATA[
 In fact, we could convert the above so that it returns a Python value directly, rather than an abstract syntax tree corresponding to a value.
         ]]></text>
-        <code hooks="Python">
-@def evaluate(e):
-    @if @type(e) == Node:
-        @for label @in e:
+        <code class="py"><![CDATA[
+def evaluate(e):
+    if type(e) == Node:
+        for label in e:
             children = e[label]
-            @if label == 'Not':
+            if label == 'Not':
                 f = children[0]
                 v = evaluate(f)
-                @return @not v # Use the Python not operator.
-            @elif label == 'And':
+                return not v # Use the Python not operator.
+            elif label == 'And':
                 f1 = children[0]
                 v1 = evaluate(f1)
                 f2 = children[1]
                 v2 = evaluate(f2)
-                @return v1 @and v2 # Use the Python and operator.
-            @elif label == 'Or':
+                return v1 and v2 # Use the Python and operator.
+            elif label == 'Or':
                 f2 = children[1]
                 v2 = evaluate(f2)
                 f1 = children[0]
                 v1 = evaluate(f1)
-                @return v1 @or v2 # Use the Python or operator.
-    @elif @type(e) == Leaf:
-        @if e == 'True':
-            @return @True # Use the Python True constant.
-        @if e == 'False':
-            @return @False # Use the Python False constant.
-        </code>
+                return v1 or v2 # Use the Python or operator.
+    elif type(e) == Leaf:
+        if e == 'True':
+            return True # Use the Python True constant.
+        if e == 'False':
+            return False # Use the Python False constant.
+        ]]></code>
       </example>
     </subsection>
     <subsection title="Execution of sequences of statements">
@@ -1185,40 +1185,40 @@ Recall that %O represents the set of outputs (e.g., to the terminal), with %o_0 
         <text hooks="math"><![CDATA[
 We can convert the above operational semantics inference rules into a Python implementation of an interpreter for this simple language. We represent outputs in %O as Python lists of values, because lists preserve order. Note that we refer to the implementation of <code>evaluate()</code> from a <a href="#60b6dc0bb16b498594677f3bb08ccc82">previous example</a>.
         ]]></text>
-        <code hooks="Python">
-@def execute(s):
-    @if @type(s) == Leaf:
-        @if s == 'End':
-            @return []
-    @elif @type(s) == Node:
-        @for label @in s:
-            @if label == 'Print':
+        <code class="py"><![CDATA[
+def execute(s):
+    if type(s) == Leaf:
+        if s == 'End':
+            return []
+    elif type(s) == Node:
+        for label in s:
+            if label == 'Print':
                 children = s[label]
                 f = children[0]
                 p = children[1]
                 v = evaluate(f) # Implemented elsewhere.
                 o = execute(p)
-                @return [v] + o
-        </code>
+                return [v] + o
+        ]]></code>
         <text hooks="math"><![CDATA[
 As before, we can actually use the Python <code>print()</code> function and turn this into an interpreter that uses the Python runtime system directly to interpret the program. However, we must be careful about where we put the call to <code>print()</code>: it must be invoked in a way that conforms to a <i>pre-order</i> traversal of the syntax tree.
         ]]></text>
-        <code hooks="Python">
-@def execute(s):
-    @if @type(s) == Leaf:
-        @if s == 'End':
-            @return []
-    @elif @type(s) == Node:
-        @for label @in s:
-            @if label == 'Print':
+        <code class="py"><![CDATA[
+def execute(s):
+    if type(s) == Leaf:
+        if s == 'End':
+            return []
+    elif type(s) == Node:
+        for label in s:
+            if label == 'Print':
                 children = s[label]
                 f = children[0]
                 p = children[1]
                 v = evaluate(f)
-                @print(v) # Must appear before recursive call.
+                print(v) # Must appear before recursive call.
                 o = execute(p)
-                @return [v] + o
-        </code>
+                return [v] + o
+        ]]></code>
       </example>
       <text hooks="math"><![CDATA[
         In an operational semantics for a language with variables and variable assignment, a data structure called an <i>environment</i> is usually used to represent what variables are in scope, as well as the values assigned to variables. We introduce a mathematical definition of an environment so that we can employ it within our operational semantics definitions.
@@ -1308,54 +1308,54 @@ Notice the use of an environment \Sigma, also known as a context, that maps vari
         <text hooks="math"><![CDATA[
 We can convert the above operational semantics inference rules into a Python implementation of an interpreter for this language. We represent environments as dictionaries in which variable names are labels, and these labels map to values in the language. The functions <code>vnot</code>, <code>vand</code>, and <code>vor</code> are the same as those in a <a href="#60b6dc0bb16b498594677f3bb08ccc82">previous example</a>.
         ]]></text>
-        <code hooks="Python">
-@def evaluate(env, e):
-    @if @type(e) == Node:
-        @for label @in e:
+        <code class="py"><![CDATA[
+def evaluate(env, e):
+    if type(e) == Node:
+        for label in e:
             children = e[label]
-            @if label == 'Not':
+            if label == 'Not':
                 f = children[0]
                 v = evaluate(env, f)
-                @return vnot(v)
-            @elif label == 'And':
+                return vnot(v)
+            elif label == 'And':
                 f1 = children[0]
                 v1 = evaluate(env, f1)
                 f2 = children[1]
                 v2 = evaluate(env, f2)
-                @return vand(v1, v2)
-            @elif label == 'Or':
+                return vand(v1, v2)
+            elif label == 'Or':
                 f2 = children[1]
                 v2 = evaluate(env, f2)
                 f1 = children[0]
                 v1 = evaluate(env, f1)
-                @return vor(v1, v2)
-            @elif label == 'Variable':
+                return vor(v1, v2)
+            elif label == 'Variable':
                 x = children[0]
-                @if x @in env:
-                    @return env[x]
-                @else:
+                if x in env:
+                    return env[x]
+                else:
                     print(x + " is unbound.")
-                    @exit()
-    @elif @type(e) == Leaf:
-        @if e == 'True':
-            @return 'True'
-        @if e == 'False':
-            @return 'False'
+                    exit()
+    elif type(e) == Leaf:
+        if e == 'True':
+            return 'True'
+        if e == 'False':
+            return 'False'
 
-@def execute(env, s):
-    if @type(s) == Leaf:
-        @if s == 'End':
-            @return []
-    @elif @type(s) == Node:
-        @for label @in s:
-            @if label == 'Print':
+def execute(env, s):
+    if type(s) == Leaf:
+        if s == 'End':
+            return []
+    elif type(s) == Node:
+        for label in s:
+            if label == 'Print':
                 children = s[label]
                 f = children[0]
                 p = children[1]
                 v = evaluate(env, f)
                 o = execute(env, p)
-                @return [v] + o
-            @if label == 'Assign':
+                return [v] + o
+            if label == 'Assign':
                 children = s[label]
                 x = children[0]['Variable'][0]
                 f = children[1]
@@ -1363,8 +1363,8 @@ We can convert the above operational semantics inference rules into a Python imp
                 v = evaluate(env, f)
                 env[x] = v
                 o = execute(env, p)
-                @return o
-        </code>
+                return o
+        ]]></code>
       </example>
       <text hooks="math"><![CDATA[
 If an abstract syntax parse tree node for a statement can have two or more children that are also statement sequences, and if the operational semantics of the language require that statements must be executed consecutively (i.e., not in parallel), then the execution algorithm must also return a new copy of the environment, modified to reflect the variable assignments that might have occurred in the statement sequence.
@@ -1406,7 +1406,7 @@ We present an operational semantics for an extension of a language in a <a href=
 \end{eqnarray}
 An example of a program in this language is presented below:
         ]]></text>
-        <code hooks="Python">
+        <code><![CDATA[
 print true;
 repeat twice {
   print false;
@@ -1414,7 +1414,7 @@ repeat twice {
 }
 print true;
 end;
-        </code>
+        ]]></code>
         <text hooks="math"><![CDATA[
 The operational semantics inference rules are the same as those in a <a href="#cbfa02d3624d42b08704d6a4c4fb9e03">previous example</a>. However, we must modify the inference rules for statements. In particular, the predicate \Downarrow that defines execution of statements must also specify the new environment that exists after a statement is executed. This is to capture the fact that a program may have variable assignments in a block of code that may be executed multiple times (or, in other languages with branching constructs, may be executed conditionally).
         ]]></text>
@@ -1441,21 +1441,21 @@ The operational semantics inference rules are the same as those in a <a href="#c
         <text hooks="math"><![CDATA[
 We can convert the above operational semantics inference rules into a Python implementation of an interpreter for this language. The implementation of <code>evaluate()</code> is the same as the one in a <a href="#cbfa02d3624d42b08704d6a4c4fb9e03">previous example</a>, while the implementation of <code>execute()</code> from <a href="#cbfa02d3624d42b08704d6a4c4fb9e03">that example</a> must be modified so that it also returns an updated version of the environment data structure.
         ]]></text>
-        <code hooks="Python">
-@def execute(env, s):
-    @if @type(s) == Leaf:
-        @if s == 'End':
-            @return (env, [])
-    @elif @type(s) == Node:
-        @for label @in s:
-            @if label == 'Print':
+        <code class="py"><![CDATA[
+def execute(env, s):
+    if type(s) == Leaf:
+        if s == 'End':
+            return (env, [])
+    elif type(s) == Node:
+        for label in s:
+            if label == 'Print':
                 children = s[label]
                 f = children[0]
                 p = children[1]
                 v = evaluate(env, f)
                 (env, o) = execute(env, p)
-                @return (env, [v] + o)
-            @if label == 'Assign':
+                return (env, [v] + o)
+            if label == 'Assign':
                 children = s[label]
                 x = children[0]['Variable'][0]
                 f = children[1]
@@ -1463,8 +1463,8 @@ We can convert the above operational semantics inference rules into a Python imp
                 v = evaluate(env, f)
                 env[x] = v
                 (env, o) = execute(env, p)
-                @return (env, o)
-            @if label == 'RepeatTwice':
+                return (env, o)
+            if label == 'RepeatTwice':
                 children = s[label]
                 body = children[0]
                 rest = children[1]
@@ -1472,8 +1472,8 @@ We can convert the above operational semantics inference rules into a Python imp
                 (env2, o1) = execute(env1, body)
                 (env3, o2) = execute(env2, body)
                 (env4, o3) = execute(env3, rest)
-                @return (env4, o1 + o2 + o3)
-        </code>
+                return (env4, o1 + o2 + o3)
+        ]]></code>
       </example>
       <example required="true" id="4ebc67e9336c475a939d6c8c0dcedc36">
         <text hooks="math"><![CDATA[
@@ -1504,19 +1504,19 @@ We consider inference rules for a few common looping constructs.
         <text hooks="math"><![CDATA[
 The following code snippet illustrates one way to implement the [Statement-While-True] and [Statement-While-False] rules.
         ]]></text>
-        <code hooks="Python">
-@if label == 'While':
+        <code class="py"><![CDATA[
+if label == 'While':
     [cond, body, rest] = s[label]
     env1 = env
     v = evaluate(env1, cond)
-    @if v == 'False':
+    if v == 'False':
         (env2, o1) = execute(env1, rest)
-        @return (env2, o1)
-    @if v == 'True':
+        return (env2, o1)
+    if v == 'True':
         (env2, o1) = execute(env1, body)
         (env3, o2) = execute(env2, {'While':[cond, body, rest]})
-        @return (env3, o1 + o2)
-        </code>
+        return (env3, o1 + o2)
+        ]]></code>
       </example>
     </subsection>
     <subsection title="Interpreters">
@@ -1979,35 +1979,35 @@ Consider the following target language, which has many characteristics of a mach
 \end{eqnarray}
 We can implement a simple Python simulator (or virtual machine, if the above is a bytecode) for this language.
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 # Simulate a machine running the program represented by the string s.
-@def simulate(s):
-    instructions = [l.split(" ") @for l @in s.split("\n")]
+def simulate(s):
+    instructions = [l.split(" ") for l in s.split("\n")]
     mem = {0: 0}
     control = 0
-    @while control < @len(instructions):
+    while control < len(instructions):
         inst = instructions[control]
-        @if inst[0] == 'label':
-            @pass
+        if inst[0] == 'label':
+            pass
         # For two arguments, test the memory address in the second
         # argument; given one argument, branch unconditionally.
-        @if inst[0] == 'branch':
-            @if @len(inst) == 2 @or mem[@int(inst[2])] != 0:
+        if inst[0] == 'branch':
+            if len(inst) == 2 or mem[int(inst[2])] != 0:
                 control = instructions.index(['label', inst[1]])
-                @continue
-        @if inst[0] == 'set':
-            mem[@int(inst[1])] = @int(inst[2])
-        @if inst[0] == 'copy':
-            mem[@int(inst[2])] = mem[@int(inst[1])]
-        @if inst[0] == 'add':
+                continue
+        if inst[0] == 'set':
+            mem[int(inst[1])] = int(inst[2])
+        if inst[0] == 'copy':
+            mem[int(inst[2])] = mem[int(inst[1])]
+        if inst[0] == 'add':
             mem[0] = mem[1] + mem[2]
         control = control + 1
-    @return mem[0]
+    return mem[0]
         ]]></code>
         <text hooks="math"><![CDATA[
 A program in this language might look as follows:
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 >>> p = '''
   label start
   set 1 2
@@ -2062,7 +2062,7 @@ We can implement a simple <a href="hw3/machine.py">Python simulator</a> for this
 <br/><br/>
 As an example of how this language might be used, suppose we want to write a program in this language to copy the contents of memory address 10 to memory address 20. The machine language program presented below would have this behavior:
         ]]></text>   
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 set 3 10
 set 4 20
 copy
@@ -2070,24 +2070,24 @@ copy
         <text hooks="math"><![CDATA[
 In fact, we can write a Python program that can generate an instance of the above for any two addresses. Notice that the <code>copy()</code> function below can be viewed as a macro that generates a specific machine language program.
         ]]></text>
-        <code hooks="Python"><![CDATA[
-@def copy(frm, to):
-   @return [\
-      'set 3 ' + @str(frm),\
-      'set 4 ' + @str(to),\
+        <code class="py"><![CDATA[
+def copy(frm, to):
+   return [\
+      'set 3 ' + str(frm),\
+      'set 4 ' + str(to),\
       'copy'\
    ]
         ]]></code>
         <text hooks="math"><![CDATA[
 Suppose we have another macro <code>increment()</code> that takes a single argument, a memory address, and generates a machine program that increments the value at the address specified memory address. We could then implement the following macro, which will set an entire region of memory to a particular constant.
         ]]></text>
-        <code hooks="Python"><![CDATA[
-@def setAllToInRegion(constant, startAddr, endAddr):
+        <code class="py"><![CDATA[
+def setAllToInRegion(constant, startAddr, endAddr):
   # Memory location 8 contains the constant.
   # Memory location 9 contains the counter.  
-  @return [\
-        'set 8 ' + @str(constant),\
-        'set 9 ' + @str(startAddr),\
+  return [\
+        'set 8 ' + str(constant),\
+        'set 9 ' + str(startAddr),\
         'label loop'\
       ] \
       # Set second argument (destination) of copy.
@@ -2106,7 +2106,7 @@ Suppose we have another macro <code>increment()</code> that takes a single argum
       + copy(9,1) \
       + [\
         # Second argument of add.
-        'set 2 -' + @str(endAddr),\
+        'set 2 -' + str(endAddr),\
         'add',\
         'branch loop 0'\
       ]
@@ -2114,7 +2114,7 @@ Suppose we have another macro <code>increment()</code> that takes a single argum
         <text hooks="math"><![CDATA[
 Running <code>setAllToInRegion()</code> on specific inputs generates a machine language program for a particular region.
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 >>> setAllToInRegion(3, 10, 100)
 ['set 8 3', 
  'set 9 10', 
@@ -2221,25 +2221,25 @@ How can we implement a compiler that converts formulas in the source language in
 <br/><br/>
 We can approach this problem by constructing a function <code>compileFormula()</code> that takes as its input the parse tree, and a variable <code>heap</code> that represents the highest address in memory that contains a computed value (in our case, <code>1</code> can represent <b>true</b> and <code>0</code> can represent <b>false</b>). The function returns a list of machine language instructions that computes that value, as well as the memory address where that value would be stored if anyone actually executed (or simulated) the machine language program.
         ]]></text>       
-        <code hooks="Python"><![CDATA[
-@def compileFormula(f, heap = 3, fresh = 0):
-    @if @type(f) == Leaf:
-        @if f == 'True':
+        <code class="py"><![CDATA[
+def compileFormula(f, heap = 3, fresh = 0):
+    if type(f) == Leaf:
+        if f == 'True':
             # Find a new memory address on the heap.
             heap = heap + 1
             # Generate instruction to store the integer representing 'True' on the heap.
-            inst = 'set ' + @str(heap) + ' 1'
+            inst = 'set ' + str(heap) + ' 1'
             # Return the instruction list and "top" of the heap.
-            @return ([inst], heap, fresh)
-        @if f == 'False':
+            return ([inst], heap, fresh)
+        if f == 'False':
             # Find a new memory address on the heap.
             heap = heap + 1
             # Generate instruction to store the integer representing 'False' on the heap.
-            inst = 'set ' + @str(heap) + ' 0'
+            inst = 'set ' + str(heap) + ' 0'
             # Return the instruction list and "top" of the heap.
-            @return ([inst], heap, fresh)
-    @if type(f) == Node:
-        @for label @in f:
+            return ([inst], heap, fresh)
+    if type(f) == Node:
+        for label in f:
             children = f[label]
             if label == 'Not':
                 # Compile the subtree f to obtain the list of
@@ -2251,15 +2251,15 @@ We can approach this problem by constructing a function <code>compileFormula()</
                 # location in accordance with the definition of the
                 # 'Not' operation.
                 instsNot = \
-                   ["branch setZero" + str(fresh) + " " + @str(heap),\
-                    "set " + @str(heap) + " 1",\
-                    "branch finish" + @str(fresh),\
-                    "label setZero" + @str(fresh),\
-                    "set " + @str(heap) + " 0",\
-                    "label finish" + @str(fresh)\
+                   ["branch setZero" + str(fresh) + " " + str(heap),\
+                    "set " + str(heap) + " 1",\
+                    "branch finish" + str(fresh),\
+                    "label setZero" + str(fresh),\
+                    "set " + str(heap) + " 0",\
+                    "label finish" + str(fresh)\
                    ]
-                @return (insts + instsNot, heap, fresh + 1)
-            @if label == 'Or':
+                return (insts + instsNot, heap, fresh + 1)
+            if label == 'Or':
                 # Compile the two subtrees and get the instructions
                 # lists as well as the addresses in which the results
                 # of computing the two subtrees would be stored if someone
@@ -2274,17 +2274,17 @@ We can approach this problem by constructing a function <code>compileFormula()</
                 # Add instructions that compute the result of the
                 # 'Or' operation.
                 instsOr = \
-                   ["copy " + @str(heap2) + " 1",\
-                    "copy " + @str(heap3) + " 2",\
+                   ["copy " + str(heap2) + " 1",\
+                    "copy " + str(heap3) + " 2",\
                     "add",\
-                    "branch setOne" + @str(fresh2) + " 0",\
-                    "branch finish" + @str(fresh2),\
-                    "label setOne" + @str(fresh2),\
+                    "branch setOne" + str(fresh2) + " 0",\
+                    "branch finish" + str(fresh2),\
+                    "label setOne" + str(fresh2),\
                     "set 0 1",\
-                    "label finish" + @str(fresh2),\
-                    "copy 0 " + @str(heap4)\
+                    "label finish" + str(fresh2),\
+                    "copy 0 " + str(heap4)\
                    ]
-                @return (insts1 + insts2 + instsOr, heap4, fresh2 + 1)
+                return (insts1 + insts2 + instsOr, heap4, fresh2 + 1)
         ]]></code>
       </example>
     </subsection>
@@ -2293,7 +2293,7 @@ We can approach this problem by constructing a function <code>compileFormula()</
         <text hooks="math"><![CDATA[
 Suppose we want to compile the following program in an imperative programming language that supports <b>while</b> loops to a machine language program in our machine language.
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 x := true; 
 while x { 
   x := false; 
@@ -2342,7 +2342,7 @@ How can we implement a compiler that converts formulas in the source language in
         <paragraph hooks="math"><![CDATA[
 As an example, suppose we begin with the following program.
         ]]></paragraph>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 procedure printProc {
   print true;
   print false;
@@ -2361,7 +2361,7 @@ However, we must compile the procedure into a <i>single</i> block of machine cod
         <paragraph hooks="math"><![CDATA[
 We will need to make sure that the <code>call printProc;</code> are compiled into machine code that stores the index of the current instruction at each call point at a particular memory location (in this example, suppose it is memory address <code>7</code>). Then, the block of machine code into which the procedure body is compiled can always consult the same memory location to determine to which point it should pass control back after the machine code for the procedure body finishes executing. Because control should not go back to the <b>goto</b> instruction but beyond it, it may be necessary to increment the value representing the program location before using the <b>jump</b> instruction. We provide machine language pseudocode below that does just that.
         ]]></paragraph>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 # The procedure.
 goto printProcEnd   # Skip procedure body.
 label printProc
@@ -2388,7 +2388,7 @@ set 5 1             # print true;
         <paragraph hooks="math"><![CDATA[
 The above approach might work if we never call a procedure from inside another procedure. However, it will not work if a <b>call</b> instruction appears inside the body of a procedure because that <b>call</b> instruction will be compiled into machine language instructions that overwrite the contents of memory address <code>7</code>, making it impossible to determine the program location to which control must return after the outermost procedure body finishes. To address this, it is possible to have the machine language program maintain a <a href="#f7d604542fe211e38cf6ce3f5508acd9"><i>stack</i></a> starting at memory location <code>7</code> that will keep track of all the program locations to which control must return after each nested procedure call finishes. We do so in the machine language pseudocode below.
         ]]></paragraph> 
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 # Set stack pointer to top of stack at address 8.
 set 7 8
 
@@ -2497,7 +2497,7 @@ Optimization algorithms are typically transformations of the abstract syntax of 
         <text><![CDATA[
 Suppose we are compiling a program written in a high-level language that looks like the following.
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 i = 0;
 while (i < 1000000) {
   i++;
@@ -2506,7 +2506,7 @@ while (i < 1000000) {
         <text><![CDATA[
 One option is to compile the above program into the following sequence of machine language instructions (assume that the variable <code>i</code> corresponds to memory address <code>123</code>).
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 label whileLoop
 < increment integer in address 123 >
 < compare integer in address 123 to integer 1000000 and store result in address 200 >
@@ -2515,7 +2515,7 @@ branch whileLoop 200
         <text><![CDATA[
 If we execute the above machine language program, we will execute 1,000,000 comparison operations. We can reduce the cost of the comparison operations in this case by duplicating the body of the loop some number of times.
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 i = 0;
 while (i < 1000000) {
   i++;
@@ -2533,7 +2533,7 @@ while (i < 1000000) {
         <text><![CDATA[
 Notice that in the above program, we have reduced the number of comparison operations by a factor of 10. However, to achieve this we had to increase the size of the machine language program by a factor of 10.
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 label whileLoop
 < increment integer in address 123 >
 < increment integer in address 123 >
@@ -2556,7 +2556,7 @@ branch whileLoop 200
         <text><![CDATA[
 Suppose we have the following abstract syntax tree.
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 {'Print': [
   {'Plus': [
     {'Mult':[{'Number':[3]}, {'Number':[4]}]},
@@ -2567,7 +2567,7 @@ Suppose we have the following abstract syntax tree.
         <text><![CDATA[
 An optimization algorithm that performs constant folding might traverse the above tree, recognize that the subtree <code>{'Mult':[{'Number':[3]}, {'Number':[4]}]}</code> can be evaluated in a finite amount of time, and then replace it with the value to which it evaluates. The overall tree would then look as follows.
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 {'Print': [
   {'Plus': [
     {'Number':[12]},
@@ -2591,7 +2591,7 @@ An abstract syntax tree can be converted into SSA form by converting every varia
         <text><![CDATA[
 Suppose we have the following program in a high-level programming language.
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 a := 2;
 b := 5;
 print a + b;
@@ -2609,7 +2609,7 @@ print a;
         <text><![CDATA[
 If we converted the abstract syntax tree that represents the above program into SSA form, we might obtain an abstract syntax tree that represents the following program.
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 a_0 := 2;
 b_0 := 5;
 print a_0 + b_0;
@@ -2793,33 +2793,33 @@ Bounded exhaustive testing involves defining a metric on inputs (e.g., a mapping
 \end{eqnarray}
 We can define a metric on the set of abstract syntax trees that conform to the above definition: the depth of the tree.
         ]]></text>
-        <code hooks="Python">
-Node = @dict
-Leaf = @str
+        <code class="py"><![CDATA[
+Node = dict
+Leaf = str
 
-@def metric(f):
-    if @type(f) == Leaf:
-        @return 1
-    if @type(f) == Node:
-        @for label @in f:
-            @return 1 + @max([metric(child) @for child @in f[label]])
-        </code>
+def metric(f):
+    if type(f) == Leaf:
+        return 1
+    if type(f) == Node:
+        for label in f:
+            return 1 + max([metric(child) for child in f[label]])
+        ]]></code>
         <text hooks="math"><![CDATA[
 We can then generate all trees whose metric falls within a specified bound.
         ]]></text>
-        <code hooks="Python"><![CDATA[
-@def formulas(n):
-    @if n <= 0:
-        @return []
-    @elif n == 1:
-        @return ['True', 'False']
-    @else:
+        <code class="py"><![CDATA[
+def formulas(n):
+    if n <= 0:
+        return []
+    elif n == 1:
+        return ['True', 'False']
+    else:
         fs = formulas(n-1)
         fsN = []
-        fsN += [{'Not':[f]} @for f @in fs]
-        fsN += [{'And':[f1,f2]} @for f1 @in fs @for f2 @in fs]
-        fsN += [{'Or':[f1,f2]} @for f1 @in fs @for f2 @in fs]
-        @return fs + fsN
+        fsN += [{'Not':[f]} for f in fs]
+        fsN += [{'And':[f1,f2]} for f1 in fs for f2 in fs]
+        fsN += [{'Or':[f1,f2]} for f1 in fs for f2 in fs]
+        return fs + fsN
         ]]></code>
         <text hooks="math"><![CDATA[
 It is then possible to use the above code to generate test cases automatically, and to check the equation specifying compiler correctness against each test case.
@@ -2956,33 +2956,33 @@ We can define a set of type inference rules for this language. These rules const
         <text hooks="math"><![CDATA[
 We can convert the above inference rules into a type checking algorithm; the process is almost identical to the process used for converting an operational semantics into an interpreter implementation.
         ]]></text>
-        <code hooks="Python"><![CDATA[
-@def typeCheck(e):
-    @if @type(e) == Leaf:
-        @if e == 'True' @or e == 'False':
-            @return 'boolean'
-    @if @type(e) == Node:
-        @for label @in e:
-            @if label == 'Number':
-                 @return 'integer'
-            @if label == 'Not':
+        <code class="py"><![CDATA[
+def typeCheck(e):
+    if type(e) == Leaf:
+        if e == 'True' or e == 'False':
+            return 'boolean'
+    if type(e) == Node:
+        for label in e:
+            if label == 'Number':
+                 return 'integer'
+            if label == 'Not':
                   [e1] = e[label]
                   t1 = typeCheck(e1)
-                  @if t1 != 'boolean':
-                     @print("not must be applied to a boolean")
-                     @return @None
-                  @return 'boolean'
+                  if t1 != 'boolean':
+                     print("not must be applied to a boolean")
+                     return None
+                  return 'boolean'
             
             # ...
             
-            @if label == 'Plus':
+            if label == 'Plus':
                 [e1,e2] = e[label]
                 t1 = typeCheck(e1)
                 t2 = typeCheck(e2)
-                @if t1 != 'integer' @or t2 != 'integer':
-                    @print("+ requires integer arguments")
-                    @return @None
-                @return 'integer'
+                if t1 != 'integer' or t2 != 'integer':
+                    print("+ requires integer arguments")
+                    return None
+                return 'integer'
         ]]></code>
       </example>
       <example required="true" id="f7d615702fe211e38cf6ce3f5508acd9">
@@ -3129,22 +3129,22 @@ We can define a set of type inference rules for this language. These rules const
         <text hooks="math"><![CDATA[
 Before implementing a type checking algorithm, suppose we want to implement an interpreter for this language. Below is an example of how it might be implemented.
         ]]></text>
-        <code hooks="Python"><![CDATA[
-@def evaluate(env, e):
-   @if @type(e) == Node:
-        @for label @in e:
+        <code class="py"><![CDATA[
+def evaluate(env, e):
+   if type(e) == Node:
+        for label in e:
             children = e[label]
-            @if label == 'Number':
+            if label == 'Number':
                 n = children[0]
-                @return n
-            @elif label == 'Plus':
+                return n
+            elif label == 'Plus':
                 [e1,e2] = children
-                @return evaluate(env, e1) + evaluate(env, e2)
-            @elif label == 'Variable':
+                return evaluate(env, e1) + evaluate(env, e2)
+            elif label == 'Variable':
                 x = children[0]
                 value = env[x]
-                @return value
-            @elif label == 'Apply':
+                return value
+            elif label == 'Apply':
                  [f, eArg] = children
                  f = f['Variable'][0] # Unpack.
                  x = env[f]['Function'][2]['Variable'][0]
@@ -3153,63 +3153,63 @@ Before implementing a type checking algorithm, suppose we want to implement an i
                  envF = env.copy()
                  envF[x] = vArg
                  vResult = evaluate(envF, eBody)
-                 @return vResult
+                 return vResult
         
-@def execute(env, s):
-    @if @type(s) == Leaf:
-        @if s == 'End':
-            @return (env, [])
-    @elif type(s) == Node:
-        @for label @in s:
-            @if label == 'Assign':
+def execute(env, s):
+    if type(s) == Leaf:
+        if s == 'End':
+            return (env, [])
+    elif type(s) == Node:
+        for label in s:
+            if label == 'Assign':
                 [var, e, p] = s[label]
                 x = var['Variable'][0]
                 env[x] = evaluate(env, e)
                 (env, o) = execute(env, p)
-                @return (env, o)
-            @if label == 'Function':
+                return (env, o)
+            if label == 'Function':
                 [f, ty, x, e, p] = s[label]
                 f = f['Variable'][0] # Unpack.
                 env[f] = s
                 (env, o) = execute(env, p)
-                @return (env, o)
+                return (env, o)
         ]]></code> 
         <text hooks="math"><![CDATA[
 A type checking algorithm implementation is presented below.
         ]]></text>
-        <code hooks="Python"><![CDATA[
-@def tyExpr(env, e):
-   @if @type(e) == Node:
-        @for label @in e:
+        <code class="py"><![CDATA[
+def tyExpr(env, e):
+   if type(e) == Node:
+        for label in e:
             children = e[label]
-            @if label == 'Number':
-                @return 'TyInt'
-            @elif label == 'Variable':
+            if label == 'Number':
+                return 'TyInt'
+            elif label == 'Variable':
                 x = children[0]
-                @return env[x]
-            @elif label == 'Apply':
+                return env[x]
+            elif label == 'Apply':
                  [f, eArg] = children
                  f = f['Variable'][0] # Unpack.
                  tyArg = tyExpr(env, eArg)
                  tyFunArg = env[f]['TyArrow'][0]
-                 @if tyArg == tyFunArg:
-                     @return env[f]['TyArrow'][1]
+                 if tyArg == tyFunArg:
+                     return env[f]['TyArrow'][1]
         
-@def tyProg(env, s):
-   @if @type(s) == Leaf:
-        @if s == 'End':
-            @return 'TyVoid'
-   @elif @type(s) == Node:
-        @for label @in s:
-            @if label == 'Assign':
+def tyProg(env, s):
+   if type(s) == Leaf:
+        if s == 'End':
+            return 'TyVoid'
+   elif type(s) == Node:
+        for label in s:
+            if label == 'Assign':
                 [x,e,p] = s[label]
                 x = x['Variable'][0] # Unpack.
                 tExpr = tyExpr(env, e)
                 env[x] = tExpr
                 tProg = tyProg(env, p)
-                @if tExpr == 'TyInt' @and tProg == 'Void':
-                    @return 'TyVoid'
-            @if label == 'Function':
+                if tExpr == 'TyInt' and tProg == 'Void':
+                    return 'TyVoid'
+            if label == 'Function':
                 [f, tyArg, x, e, p] = s[label]
                 name = f['Variable'][0]
                 x = x['Variable'][0]
@@ -3219,7 +3219,7 @@ A type checking algorithm implementation is presented below.
                 if tBody == 'TyInt':
                     env[name] = {'TyArrow':[tyArg, tBody]}
                     tProg = tyProg(env, p)                  
-                    @return tProg
+                    return tProg
         ]]></code>
       </example>
       <example required="true" id="f7d61e6c2fe211e38cf6ce3f5508acd9">
@@ -3341,30 +3341,30 @@ We can define the following abstract interpretation of the language:
         <text hooks="math"><![CDATA[
 We can implement the above inference rules as an abstract interpretation algorithm.
         ]]></text>
-        <code hooks="Python"><![CDATA[
-@def timeExpr(e):
-    @if type(e) == Node:
-        @for label @in e:
+        <code class="py"><![CDATA[
+def timeExpr(e):
+    if type(e) == Node:
+        for label in e:
             children = e[label]
-            @if label == 'Number':
-                @return 1
-            @elif label == 'Mult':
+            if label == 'Number':
+                return 1
+            elif label == 'Mult':
                 [e1,e2] = children
-                @return 1 + timeExpr(e1) + timeExpr(e2)
+                return 1 + timeExpr(e1) + timeExpr(e2)
 
-@def timeProg(env, s):
-    @if @type(s) == Leaf:
-        @if s == 'End':
-            @return 0
-    @elif type(s) == Node:
-        @for label @in s:
-            @if label == 'Print':
+def timeProg(env, s):
+    if type(s) == Leaf:
+        if s == 'End':
+            return 0
+    elif type(s) == Node:
+        for label in s:
+            if label == 'Print':
                 [e,p] = s[label]
-                @return 1 + timeExpr(e) + timeProg(env, p)
-            @if label == 'For':
+                return 1 + timeExpr(e) + timeProg(env, p)
+            if label == 'For':
                 [var, num, p1, p2] = s[label]
                 n = num['Number'][0]
-                @return n * timeProg(env, p1) + timeProg(env, p2)
+                return n * timeProg(env, p1) + timeProg(env, p2)
 
                 # ...
         ]]></code>
@@ -3428,37 +3428,37 @@ Suppose that a single <b>reserve</b> %d <b>;</b> statement reserves a distinct c
         <text hooks="math"><![CDATA[
 We can implement the above inference rules as an abstract interpretation algorithm.
         ]]></text>
-        <code hooks="Python"><![CDATA[
-@def costDuration(e):
-    @if @type(e) == Node:
-        @for label @in e:
+        <code class="py"><![CDATA[
+def costDuration(e):
+    if type(e) == Node:
+        for label in e:
             children = e[label]
-            @if label == 'Minutes':
+            if label == 'Minutes':
                 [num] = children
                 n = num['Number'][0]
-                @return n * 0.01
-            @if label == 'Hours':
+                return n * 0.01
+            if label == 'Hours':
                 [num] = children
                 n = num['Number'][0]
-                @return n * 0.60
-            @if label == 'Days':
+                return n * 0.60
+            if label == 'Days':
                 [num] = children
                 n = num['Number'][0]
-                @return n * 14.40
+                return n * 14.40
 
-@def costProg(env, s):
-    @if @type(s) == Leaf:
-        @if s == 'End':
-            @return 0
-    @elif @type(s) == Node:
+def costProg(env, s):
+    if type(s) == Leaf:
+        if s == 'End':
+            return 0
+    elif type(s) == Node:
         for label in s:
-            @if label == 'Reserve':
+            if label == 'Reserve':
                 [d,p] = s[label]
-                 @return costDuration(d) + costProg(env, p)
-            @if label == 'For':
+                 return costDuration(d) + costProg(env, p)
+            if label == 'For':
                 [var, num, p1, p2] = s[label]
                 n = num['Number'][0]
-                @return n * costProg(env, p1) + costProg(env, p2)
+                return n * costProg(env, p1) + costProg(env, p2)
 
             # ...
         ]]></code>
@@ -3906,7 +3906,7 @@ Whether unification can be computed efficiently, or at all, depends on the subse
         <text hooks="math"><![CDATA[
 The Python operational semantics (and interpreter) employ a pattern matching unification algorithm in some cases. For example, it is possible to assign to arbitrarily deep tree of nested tuples.
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 >>> (a,(b,c),(d,(e,f),g)) = (1,(2,3),(4,(5,6),7))
 >>> (a,b,c,d,e,f,g)
 (1,2,3,4,5,6,7)
@@ -3923,8 +3923,8 @@ In order to define the operational semantics for a declarative language, we must
 <br/><br/>
 In the Haskell programming language, a <i>module</i> is a collection of declarations (that can occur in any order) of variables, functions, and types. For example:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@module Example @where
+      <code class="haskell"><![CDATA[
+module Example where
 
 c = 5;
 
@@ -3936,7 +3936,7 @@ f (x) = 2 * x + 1;
       <text hooks="math"><![CDATA[
 A Haskell interpreter first assembles the module without performing any evaluation, and then allows users to make queries about that module. Queries take the form of expressions, and the response to a query is the evaluation of that expression with respect to the entire module (i.e., all the definitions in the module).
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 *> c + c
 10
 *> f(4)
@@ -3945,8 +3945,8 @@ A Haskell interpreter first assembles the module without performing any evaluati
       <text hooks="math"><![CDATA[
 Haskell natively supports lists and tuples, and the evaluation algorithm employs the <a href="#95e800c8e74e4991a2ddb48668b544e0">pattern matching unification</a> algorithm. Suppose we have the following module:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@module AnotherExample @where
+      <code class="haskell"><![CDATA[
+module AnotherExample where
 
 f (-1) = 1;
 f (0) = 0;
@@ -3959,7 +3959,7 @@ g([x,y,z]) = [z,y,x];
       <text hooks="math"><![CDATA[
 We can query the above module as follows:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 *> f(-1)
 1
 *> d
@@ -3972,32 +3972,32 @@ We can query the above module as follows:
       <text hooks="math"><![CDATA[
 Some declarative languages natively support abstract mathematical, logical, and algebraic structures such as BNF notation, abstract syntaxes, logical formulas and predicates, and inference rules. Haskell natively supports user-defined <i>algebraic data types</i>. An algebraic data type is effectively a user-defined abstract syntax; the Haskell syntax for defining algebraic data types corresponds closely to BNF notation. In the module below, we define an algebraic data type for representing binary trees.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@module Tree @where
+      <code class="haskell"><![CDATA[
+module Tree where
 
-@data Tree = Leaf | Node Tree Tree;
+data Tree = Leaf | Node Tree Tree;
       ]]></code>
       <text hooks="math"><![CDATA[
 Most Haskell interpreters and compilers support infix notation in data type definitions as well.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@data Tree = Leaf | Tree `Node` Tree;
+      <code class="haskell"><![CDATA[
+data Tree = Leaf | Tree `Node` Tree;
       ]]></code>
       <text hooks="math"><![CDATA[
 Once the above module is parsed and built, the user is allowed to construct instances of the <code>Tree</code> algebraic data type. However, in order to actually display instances of the data type, it is necessary to ask the Haskell interpreter to derive a definition of a <code>show</code> function automatically from the definition of the algebraic data type (something that is done implicitly in, for example, Python). Haskell requires that this be requested explicitly because it also allows users to define their own variants of such functions.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@module Tree @where
+      <code class="haskell"><![CDATA[
+module Tree where
 
-@data Tree = 
+data Tree = 
     Leaf 
   | Node Tree Tree 
-  @deriving Show;
+  deriving Show;
       ]]></code>
       <text hooks="math"><![CDATA[
 We can now try building trees using this algebraic data type.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 *> Leaf           -- We represented this using "Leaf" in Python.
 Leaf
 
@@ -4013,7 +4013,7 @@ Node Leaf (Node (Node Leaf Leaf) (Node Leaf Leaf))
       <text hooks="math"><![CDATA[
 Haskell's native support for pattern matching unification makes it possible to write concise definitions for functions that are defined over trees.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 -- Count the number of nodes in a tree that have exactly one non-leaf child.
 -- The spaces between the ( ... ) are just for legibility.
 nodesWithOneLeaf (Node Leaf Leaf) = 0;
@@ -4029,16 +4029,16 @@ Algebraic data types are very well-suited for represented abstract syntaxes of l
         <text hooks="math"><![CDATA[
 Suppose we want to define an abstract syntax and simple interpreter for formulas. We can use the declarations below to do so.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@module Formula @where
+        <code class="haskell"><![CDATA[
+module Formula where
 
-@data Formula = 
+data Formula = 
     T
   | F
   | Not Formula
   | And Formula Formula
   | Or Formula Formula
-  @deriving Show;
+  deriving Show;
 
 vNot (T) = F;
 vNot (F) = T;
@@ -4062,7 +4062,7 @@ eval (Or  f1 f2) = vOr (eval f1, eval f2);
         <text hooks="math"><![CDATA[
 Using wildcards (written using the underscore <code>_</code>) in patterns makes it possible to write even more concise definitions.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 vAnd (T, T) = T;
 vAnd _      = F;
 
@@ -4077,14 +4077,14 @@ eval (f)         = f;
         <text hooks="math"><![CDATA[
 To check equality of algebraic data type instances, it is necessary to either implement or derive the equality function <code>==</code>. To have the Haskell interpreter or compiler derive it automatically, you can use <code>deriving Eq</code>. These can be combined with other <code>deriving</code> directives, such as in the example below.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data Formula = 
+        <code class="haskell"><![CDATA[
+data Formula = 
     T
   | F
   | Not Formula
   | And Formula Formula
   | Or Formula Formula
-  @deriving (Eq, Show);
+  deriving (Eq, Show);
         ]]></code>
       </example>
     </subsection>
@@ -4127,15 +4127,15 @@ Haskell allows users to define their own algebraic data types as well as their o
       <text hooks="math"><![CDATA[
 Haskell lists have a list type in Haskell. For example, a list of integers has the type <code>[Integer]</code>.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 list :: [Integer]
 list = [1,2,3]
       ]]></code>
       <text hooks="math"><![CDATA[
 Haskell lists are actually represented using an algebraic data type that is similar to the <code>Tree</code> data type <a href="#7.4">that we have already seen</a>. If we were to define our own algebraic data type for lists in Haskell, for example, we could do so as follows (the terms "nil" and "cons" are commonly used in the functional language community for the empty list and for the list node constructor, respectively):
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@data List = Nil | Cons Integer List
+      <code class="haskell"><![CDATA[
+data List = Nil | Cons Integer List
 
 example :: List
 example = Cons 1 (Cons 2 (Cons 3 Nil))
@@ -4143,7 +4143,7 @@ example = Cons 1 (Cons 2 (Cons 3 Nil))
       <text hooks="math"><![CDATA[
 The built-in list type has its own special names for the two constructors: the empty list is denoted <code>[]</code>, and the list node constructor is the operator <code>(:)</code>, which can also be written as an infix operator <code>:</code>. The following three syntaxes are equivalent, and evaluate to the same list <code>[1,2,3]</code>:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 example1 :: [Integer]
 example1 = (:) 1 ((:) 2 ((:) 3 []))
 
@@ -4156,21 +4156,21 @@ example3 =  [1,2,3]
       <text hooks="math"><![CDATA[
 There is also a syntax for defining lists that contain ranges of integers:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 *> [1..4]
 [1,2,3,4]
       ]]></code>
       <text hooks="math"><![CDATA[
 Haskell supports user-defined type synonyms. These are simply substituted and have no restrictive effects.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@type Distance = Integer
+      <code class="haskell"><![CDATA[
+type Distance = Integer
       ]]></code>
       <text hooks="math"><![CDATA[
 There are some default type synonym definitions, such as <code>String</code>; strings in Haskell are just lists of characters:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@type String = [Char]
+      <code class="haskell"><![CDATA[
+type String = [Char]
 
 example1 :: String
 example1 = "abcdefg"
@@ -4181,32 +4181,32 @@ example2 = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
       <text hooks="math"><![CDATA[
 Type synonyms can be assigned any valid type, no matter how complex it may be. In the below example, the type synonym <code>GameStrategyAlgorithm</code> is equivalent to the type <code>[[(Integer, Integer)]] -> String</code> (i.e., the type for functions that take lists of lists of integer pairs and return a string):
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@type GameState = [(Integer, Integer)]
-@type Game = [GameState]
-@type Strategy = String
-@type GameStrategyAlgorithm = Game -> Strategy
+      <code class="haskell"><![CDATA[
+type GameState = [(Integer, Integer)]
+type Game = [GameState]
+type Strategy = String
+type GameStrategyAlgorithm = Game -> Strategy
       ]]></code>
     </subsection>
     <subsection title="Defining and working with infinite data type instances using lazy evaluation">
       <text hooks="math"><![CDATA[
 Since Haskell expressions are only evaluated when a query is made, a Haskell module can safely describe recursively defined, potentially infinitely large values. For example, we can define an infinite list containing the integer <code>1</code> in every position:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 infinite :: [Integer]
 infinite = [1] ++ infinite
       ]]></code>
       <text hooks="math"><![CDATA[
 Equivalently, we can use the <code>(:)</code> list node constructor:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 infinite :: [Integer]
 infinite = 1 : infinite
       ]]></code>
       <text hooks="math"><![CDATA[
 Haskell also allows infinite lists containing ranges to be declared using the list range notation:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 *> take 10 [5..]
 [5,6,7,8,9,10,11,12,13,14]
       ]]></code>
@@ -4215,7 +4215,7 @@ The Haskell operational semantics is based on pattern matching unification, but 
 <br/><br/>
 Haskell lazy evaluation operational semantics make it possible to perform queries on infinite values without running into an infinite recursion or infinite loop. For example, suppose we define the following function on lists, which takes only the first <code>n</code> elements of a list (note that this function is already included in the <code>Prelude</code>; we use <code>take_</code> for our examples to avoid a name collision).
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 take_ :: (Integer, [Integer]) -> [Integer]
 take_ (0, xs    ) = []
 take_ (n, (x:xs)) = x : take (n-1, xs)
@@ -4223,28 +4223,28 @@ take_ (n, (x:xs)) = x : take (n-1, xs)
       <text hooks="math"><![CDATA[
 Querying the infinite list is not a problem if we use <code>take</code>.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 *> take_ (10, infinite)
 [1,1,1,1,1,1,1,1,1,1]
       ]]></code>
       <text hooks="math"><![CDATA[
 Using pattern matching unification and lazy evaluation, it is also possible to define algorithm that can operate on infinite lists. For example, we can define a function that adds all the corresponding elements of two infinite lists. Notice that there is no case for the empty list in this definition because infinite lists are never empty.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 addInfiniteLists :: ([Integer], [Integer]) -> [Integer]
 addInfiniteLists (x:xs, y:ys) = (x + y) : addInfiniteLists (xs, ys)
       ]]></code>
       <text hooks="math"><![CDATA[
 We can now use the <code>addInfiniteLists</code> function to add two infinite lists. Suppose we have the following definitions:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 ones = 1 : ones
 twos = 2 : twos
       ]]></code>
       <text hooks="math"><![CDATA[
 We can then define an infinite list in which all entries are <code>3</code>:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 *> take 10 (addInfiniteLists (ones, twos))
 [3,3,3,3,3,3,3,3,3,3]
       ]]></code>
@@ -4255,7 +4255,7 @@ Haskell is a functional language; functional languages are distinguished by thei
 <br/><br/>
 To start become familiar with the concept of a higher-order function, we can consider the following example:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 f :: Integer -> Integer
 f (x) = x + 1
 
@@ -4265,7 +4265,7 @@ g (y) = f
       <text hooks="math"><![CDATA[
 Notice that <code>g</code> is a function that takes an integer as an argument. It then throws this argument away and returns the function <code>f</code>. Its type reflects this. Thus, the result of evaluating an expression such as <code>g(4)</code> is a function of type <code>Integer -> Integer</code>, and this function can be applied to another argument.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 *> :t g(1)
 g(1) :: Integer -> Integer
 *> :t g(1)(5)
@@ -4276,14 +4276,14 @@ g(1)(5) :: Integer
       <text hooks="math"><![CDATA[
 What if we want to define a function like <code>g</code> that can be partially applied to only some of its arguments, but that still uses all of its arguments? We can do so by listing multiple, space-separated parameters in the definition of <code>g</code>.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 g :: Integer -> (Integer -> Integer)
 g (y) (x) = y + x
       ]]></code>
       <text hooks="math"><![CDATA[
 It is then possible to apply <code>g</code> to arguments one at a time, as before.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 *> :t g(3)
 g(3) :: Integer -> Integer
 *> :t g(3)(4)
@@ -4294,12 +4294,12 @@ g(3)(4) :: Integer
       <text hooks="math"><![CDATA[
 Notice the relationship between application of functions to arguments, and the types of each intermediate result. Suppose we have the following definitions.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@data A = A
-@data B = B
-@data C = C
-@data D = D
-@data E = E
+      <code class="haskell"><![CDATA[
+data A = A
+data B = B
+data C = C
+data D = D
+data E = E
 
 f :: A -> (B -> (C -> (D -> E)))
 f a b c d = E
@@ -4307,7 +4307,7 @@ f a b c d = E
       <text hooks="math"><![CDATA[
 Then we have the following types for each of the following expressions (spacing adjusted for legibility):
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 *> :t f
 f             :: A -> (B -> (C -> (D -> E)))
 
@@ -4327,7 +4327,7 @@ f(A)(B)(C)(D) :: E
         <text hooks="math"><![CDATA[ 
 We want to write a higher-order function that takes any function <code>f</code> of type <code>Integer -> Integer</code> and returns a function <code>f'</code> that is its reflection across the %x-axis (i.e., for all <code>x</code>, <code>f(x)</code> = <code>-f'(x)</code>).
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 reflect :: (Integer -> Integer) -> Integer -> Integer
 reflect (f) (x) = - f(x) 
         ]]></code>
@@ -4339,14 +4339,14 @@ Notice that we could also write the type as <code>(Integer -> Integer) -> (Integ
         <text hooks="math"><![CDATA[ 
 We want to write a higher-order function that takes any function <code>f</code> of type <code>Integer -> Integer</code> and returns an integer approximation of its definite integral starting at %x = 0.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 integral :: (Integer -> Integer) -> Integer -> Integer
 integral (f) (x) = sum [ f(k) | k <- [0..x] ]
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We could also write a higher-order function that takes any function <code>f</code> of type <code>Double -> Double</code> and returns an approximation of its definite integral starting at %x = 0 for a given precision.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 integral :: Double -> (Double -> Double) -> Double -> Double
 integral (i) (f) (x) = sum [ f(k*i)*i | k <- [0..(x/i)] ]
         ]]></code>
@@ -4355,7 +4355,7 @@ integral (i) (f) (x) = sum [ f(k*i)*i | k <- [0..(x/i)] ]
         <text hooks="math"><![CDATA[ 
 We want to write a higher-order function that takes any function <code>f</code> of type <code>Double -> Double</code> and returns an approximation of its derivative.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 derivative :: Double -> (Double -> Double) -> Double -> Double
 derivative (h) (f) (x) = (f(x + h) - f(x)) / h
         ]]></code>
@@ -4369,8 +4369,8 @@ Declarative languages are well-suited for describing logical models and then exa
         <text hooks="math"><![CDATA[ 
 Suppose we want to model a simple access control system (e.g., for a file system). Notice that we can view functions like <code>user()</code> and <code>owns()</code> either as tables in a database (with each declaration for the function acting as a row in the table) or as logical predicates.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data Constant = Alice | Bob | X | Y | Z @deriving (Eq, Show)
+        <code class="haskell"><![CDATA[
+data Constant = Alice | Bob | X | Y | Z deriving (Eq, Show)
 
 -- Define which constants are a file.
 file (X) = True
@@ -4405,9 +4405,9 @@ read (user, file) = True
         <text hooks="math"><![CDATA[ 
 In the above example, we needed to define predicates that distinguished different types of constants. However, this means that every call to <code>file()</code> and <code>user()</code> must take place when the program is running. We can make the code more efficient by instead declaring distinct types. Since type checking is performed only at compile time in Haskell, this will still ensure that there are no type errors, but it will be more efficient because fewer function invocations will occur when the program is running.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data User = Alice | Bob @deriving (Eq, Show)
-@data File = X | Y | Z @deriving (Eq, Show)
+        <code class="haskell"><![CDATA[
+data User = Alice | Bob deriving (Eq, Show)
+data File = X | Y | Z deriving (Eq, Show)
 
 admin :: User -> Bool
 admin (Alice) = True
@@ -4431,47 +4431,47 @@ read (user, file) = True
       <text hooks="math"><![CDATA[
 Typed languages that support algebraic data types make it possible to implement and enforce a kind of data encapsulation. For example, suppose we want to represent distances in various units (such as Imperial and metric units) in our program. There are well-known examples of expensive software failures (such as the crash of the <a href="http://en.wikipedia.org/wiki/Mars_Climate_Orbiter">Mars Climate Orbiter</a>) that occurred because one component assumed that numerical data was in Imperial units, while another component assumed it was metric units.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@data Meters = Meters Integer
-@data Feet = Feet Integer
+      <code class="haskell"><![CDATA[
+data Meters = Meters Integer
+data Feet = Feet Integer
       ]]></code>
       <text hooks="math"><![CDATA[
 Given the above, it is now possible to enforce which type of measurement is supported by a function. For example:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@data Action = KeepGoing | SlowDown
+      <code class="haskell"><![CDATA[
+data Action = KeepGoing | SlowDown
 
 updateVelocity :: Feet -> Action
-updateVelocity (Feet n) = @if n < 100 @then SlowDown @else KeepGoing
+updateVelocity (Feet n) = if n < 100 then SlowDown else KeepGoing
       ]]></code>
     </subsection>
     <subsection title="Predefined Haskell type classes, user-defined operators, and embedded languages">
       <text hooks="math"><![CDATA[
 Haskell allows programmers to define their own functions for converting algebraic data type values to strings (e.g., for displaying them in the interactive interface), and it allows programmers to provide custom definitions for numeric literals (i.e., <code>0</code>, <code>1</code>, <code>2</code>, and so on) and built-in operators (such as <code>+</code>, <code>*</code>, and so on).
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@instance Num Meters @where
+      <code class="haskell"><![CDATA[
+instance Num Meters where
   fromInteger n = Meters n
   (Meters x) + (Meters y) = Meters (x + y)
       ]]></code>
       <text hooks="math"><![CDATA[
 The above definitions allow us to use the numeric liters and built-in operators to work with values of type <code>Meters</code>.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 *> 1 + 2 + 3 :: Meters
 Meters 6
       ]]></code>
       <text hooks="math"><![CDATA[
 It is also possible to provide a user-defined function for converting values of type <code>Meters</code> to strings.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@instance Show Meters @where
+      <code class="haskell"><![CDATA[
+instance Show Meters where
   show (Meters n) = show n ++ " meters"
       ]]></code>
       <text hooks="math"><![CDATA[
 Then, we have the following behavior:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 *> 1 + 2 + 3 :: Meters
 6 meters
       ]]></code>
@@ -4485,13 +4485,13 @@ An <i>embedded language</i> is a subset of the concrete syntax of a programming 
         <text hooks="math"><![CDATA[ 
 Suppose we define the following algebraic data types, corresponding to an abstract syntax for an imperative programming language. This definition, along with some of Haskell's other features, will allow us to turn this into an <a href="#6c93307257d142a09a6927e0ecd8603a"><i>embedded language</i></a> within Haskell. We can then use Haskell's concrete syntax to write the concrete syntax for this language, and Haskell's evaluation algorithm will also act as the parser for this language (with the Haskell evaluation algorithm producing an abstract syntax tree representation of whatever is written).
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data Term =
+        <code class="haskell"><![CDATA[
+data Term =
     Number Integer
   | Plus Term Term
-  @deriving Show
+  deriving Show
       
-@data Formula = 
+data Formula = 
     T 
   | F 
   | Not Formula 
@@ -4499,18 +4499,18 @@ Suppose we define the following algebraic data types, corresponding to an abstra
   | Or Formula Formula
   | Equal Term Term
   | LessThan Term Term
-  @deriving Show
+  deriving Show
 
-@data Statement =
+data Statement =
     Print Term Statement
   | If Formula Statement Statement
   | End
-  @deriving Show
+  deriving Show
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We also introduce some user-defined infix operators, and add user-specified definitions for some built-in Haskell operators:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 (<<<) :: Term -> Term -> Formula
 (<<<) t1 t2 = LessThan t1 t2
 
@@ -4523,14 +4523,14 @@ We also introduce some user-defined infix operators, and add user-specified defi
 (|||) :: Formula -> Formula -> Formula
 (|||) f1 f2 = Or f1 f2
 
-@instance Num Term @where
+instance Num Term where
   fromInteger n = Number n
   t1 + t2 = Plus t1 t2
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We can now use all of the above together with the <code>$</code> syntax to easily write down abstract syntax trees.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 parseTree =
    Print 5 $
    Print 6 $
@@ -4544,7 +4544,7 @@ parseTree =
         <text hooks="math"><![CDATA[ 
 Evaluating the definition of <code>parseTree</code> will yield the actual algebraic data type instance (i.e., a parse tree).
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> parseTree
 Print (Number 5) (Print (Number 6) (
   If
@@ -4558,16 +4558,16 @@ Print (Number 5) (Print (Number 6) (
       <text hooks="math"><![CDATA[ 
 Like Java/C/C++, Haskell provides a built-in ternary operator <code>if ... then ... else ...</code> for writing conditional expressions:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-*> @if True @then 1 @else 2
+      <code class="haskell"><![CDATA[
+*> if True then 1 else 2
 1
-*> @if False && True @then "Yes" @else "No"
+*> if False && True then "Yes" else "No"
 "No"
       ]]></code>
       <text hooks="math"><![CDATA[ 
 However, this is only a convenience; a user can easily implement his or her own syntax for this purpose. The support for pattern matching unification and lazy evaluation that Haskell's operational semantics provides is sufficient. Two example implementations are provided below.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 if' :: (Bool, Integer, Integer) -> Integer
 if' (True,  trueBranch, falseBranch) = trueBranch
 if' (False, trueBranch, falseBranch) = falseBranch
@@ -4583,20 +4583,20 @@ The <code>if ... then ... else ...</code> syntax (or function, as we have seen a
         <text hooks="math"><![CDATA[ 
 Suppose we are trying to represent an <a href="#e1a5053a93d54ad4b02da10e4981b810">environment</a> or <a href="#f7d600442fe211e38cf6ce3f5508acd9">substitution</a> using a data structure in Haskell. We might do so by using a list of tuples, where each tuple is a pair consisting of a <code>String</code> and a value (e.g., an <code>Integer</code>). For example:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 [("x",1), ("y", 2)] :: [(String, Integer)]
         ]]></code>
         <text hooks="math"><![CDATA[ 
 Then, we would need a function that can help us retrieve a value associated with a particular variable name.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 lookup' :: String -> [(String, Integer)] -> Integer
-lookup' x ((x',i) : rest) = @if x == x' @then i @else lookup' x rest
+lookup' x ((x',i) : rest) = if x == x' then i else lookup' x rest
         ]]></code>
         <text hooks="math"><![CDATA[ 
 In fact, Haskell's <a href="http://hackage.haskell.org/package/base">base</a> library contains a similar function, <code>lookup</code>. However, since it returns a result that is wrapped in a <code>Maybe</code> constructor, we can unwrap it using, e.g.:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 unwrap :: Maybe Integer -> Integer
 unwrap (Just n) = n
         ]]></code>
@@ -4608,18 +4608,18 @@ We discuss <code>Maybe</code> in <a href="#123b1d495c5f4c03827519c53ad95ee2">mor
         <text hooks="math"><![CDATA[ 
 Suppose we want to write a simple interpreter for formulas (similar to the one in <a href="#beb651b8549a4706a411ce0af3cd0010">this example</a>), except we also want to support variables in the language. The data type corresponding to the abstract syntax might then look as follows:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data Formula =
+        <code class="haskell"><![CDATA[
+data Formula =
     T
   | F
   | Variable String
   | Xor Formula Formula
-  @deriving Show
+  deriving Show
       ]]></code>
         <text hooks="math"><![CDATA[ 
 We can then write a simple interpreter that uses environments (as defined in <a href="#cb9d023417604b6eafe52b06e26f35fb">this example</a>) in the following way (notice that the logical operation <b>xor</b> can be represented with the inequality operator <code>/=</code> on booleans):
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 eval :: [(String, Bool)] -> Formula -> Bool
 eval env (T         ) = True
 eval env (F         ) = False
@@ -4629,7 +4629,7 @@ eval env (Xor f1 f2 ) = eval env f1 /= eval env f2
         <text hooks="math"><![CDATA[ 
 We can then run the evaluation algorithm above on a given environment and expression containing variables:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> eval [("x", True), ("y", False), ("z", True)] (Xor (Variable "x") (Variable "y"))
 True
         ]]></code>
@@ -4638,14 +4638,14 @@ True
         <text hooks="math"><![CDATA[ 
 Suppose we want to represent our own totally ordered set. For example, suppose we have the following data type for representing a discrete subset of the color spectrum:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data Color = Red | Green | Blue
+        <code class="haskell"><![CDATA[
+data Color = Red | Green | Blue
         ]]></code>
         <text hooks="math"><![CDATA[ 
 Since <code>Red</code> has the lowest frequency and <code>Blue</code> has the highest frequency, we can define an ordering on all instances of this data type by making the <code>Color</code> type a member of the <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Ord.html"><code>Ord</code></a> type class. Note that we could use wildcards (<code>_</code>) to make the definition more concise.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@instance Ord Color @where
+        <code class="haskell"><![CDATA[
+instance Ord Color where
   Red   <= Red   = True
   Red   <= Green = True
   Red   <= Blue  = True
@@ -4662,13 +4662,13 @@ It is now possible to use the built-in operators <code>&lt;</code>, <code>&lt;=<
         <text hooks="math"><![CDATA[ 
 Suppose we have a data type that allows us to build trees that contain integer constants in their leaves.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data IntegerTree = Node IntegerTree IntegerTree | Leaf Integer
+        <code class="haskell"><![CDATA[
+data IntegerTree = Node IntegerTree IntegerTree | Leaf Integer
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We can define a recursive function that assembles all the integers in the leaves in a single list.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 ints :: IntegerTree -> [Integer]
 ints (Node t1 t2) = ints t1 ++ ints t2
 ints (Leaf n    ) = [n]
@@ -4678,44 +4678,44 @@ ints (Leaf n    ) = [n]
         <text hooks="math"><![CDATA[ 
 Suppose we want to write a function that composes two functions on integers. We might define a type synonym for such functions:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 type Function = Integer -> Integer
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We then know that one possible type for a composition function might be as follows (it takes two function arguments, and returns a new composed function as a result):
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 compose :: Function -> Function -> Function
         ]]></code>
         <text hooks="math"><![CDATA[ 
 However, how do we actually implement <code>compose</code>?
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 compose f g = ?
         ]]></code>
         <text hooks="math"><![CDATA[ 
 To understand how we can do so, we must first expand the type of <code>compose</code>; let's substitute one the right-most <code>Function</code> synonym with its definition:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 compose :: Function -> Function -> (Integer -> Integer)
         ]]></code>
         <text hooks="math"><![CDATA[ 
 Now recall that the <code>-&gt;</code> type operator is right-associative; this means we can remove the right-most set of parentheses without changing the meaning of the type:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 compose :: Function -> Function -> Integer -> Integer
         ]]></code>
         <text hooks="math"><![CDATA[ 
 It is now clear how to implement <code>compose</code>: it takes two <code>Function</code> arguments, and one <code>Integer</code> argument:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 compose :: Function -> Function -> Integer -> Integer
 compose f g x = f(g(x))
         ]]></code>
         <text hooks="math"><![CDATA[ 
 Note that this function is already available in the Haskell <a href="http://hackage.haskell.org/package/base">base</a> library, and it is called <code>(.)</code>. So we could also have defined <code>compose</code> as follows:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 compose :: Function -> Function -> Function
 compose f g = f . g
         ]]></code>
@@ -4732,7 +4732,7 @@ Haskell list comprehension syntax can be combined with Haskell's built-in patter
         <text hooks="math"><![CDATA[ 
 In Haskell, list comprehensions make it possible to build up a list by iterating over the elements of one or more other lists (possibly filtering entries using one or more formulas).
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> [x+1 | x <- [0..4]]
 [1,2,3,4,5]
 
@@ -4750,11 +4750,11 @@ In Haskell list comprehensions, the left-hand side of the membership operator <c
         <paragraph hooks="math"><![CDATA[ 
 Suppose a module contains a data type definition for a simple tree data structure, and a list of trees.
         ]]></paragraph>
-        <code hooks="Haskell"><![CDATA[
-@data Tree =
+        <code class="haskell"><![CDATA[
+data Tree =
     Node Tree Tree
   | Leaf
-  @deriving Show
+  deriving Show
 
 example :: [Tree]
 example = [
@@ -4767,7 +4767,7 @@ example = [
         <text hooks="math"><![CDATA[ 
 Then we can evaluate comprehensions such as the following. The first expression builds a list of the right subtrees of all the trees in <code>example</code>. The second expression builds a list containing the right subtrees that are not leaves. The last expression builds a list of subtree pairs for each non-leaf tree.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> [r | Node _ r <- example]
 [Leaf, Leaf, Node Leaf Leaf, Node (Node Leaf Leaf) Leaf]
 
@@ -4780,7 +4780,7 @@ Then we can evaluate comprehensions such as the following. The first expression 
         <text hooks="math"><![CDATA[ 
 We can also easily check whether a particular kind of tree is in the list (such as a non-leaf tree) by adding a value of type <code>()</code> for each matching entry and then checking the length of the list resulting from the comprehension, or by comparing it to the empty list.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> length [() | Node _ _ <- example] > 0
 True
 
@@ -4797,12 +4797,12 @@ In many artificial intelligence and optimization problems, the collection of pos
         <text hooks="math"><![CDATA[ 
 Suppose we want to model a <a href="http://en.wikipedia.org/wiki/Tic-tac-toe">Tic-tac-toe</a> game, with the eventual goal of writing an AI algorithm that can play the game well. We can first settle on a representation for the board.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data Cell = E | X | O @deriving (Eq, Show)
-@type Pos = (Integer, Integer)
-@data Board = Board [(Pos, Cell)] @deriving Eq
+        <code class="haskell"><![CDATA[
+data Cell = E | X | O deriving (Eq, Show)
+type Pos = (Integer, Integer)
+data Board = Board [(Pos, Cell)] deriving Eq
 
-@instance Show Board @where
+instance Show Board where
   show (Board pcs) = show [c | (p,c) <- pcs]
 
 start :: Board
@@ -4811,49 +4811,49 @@ start = Board [((r,c),E) | r <- [1..3], c <- [1..3]]
         <text hooks="math"><![CDATA[ 
 Notice that the starting board consists of all empty cells.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> start
 [E,E,E,E,E,E,E,E,E]
         ]]></code>
         <text hooks="math"><![CDATA[ 
 When a player moves, they place an <code>X</code> or <code>O</code> somewhere on the board. We can model this using a function that, given a move, transforms one board into another board. We use a list comprehension that updates only the cell with the corresponding position.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 move :: ((Pos, Cell), Board) -> Board
-move ((pos', cell'), Board pcs) = Board [(pos, @if pos' == pos @then cell' @else cell) | (pos, cell) <- pcs]
+move ((pos', cell'), Board pcs) = Board [(pos, if pos' == pos then cell' else cell) | (pos, cell) <- pcs]
         ]]></code>
         <text hooks="math"><![CDATA[ 
 Suppose we want to make a state space graph that captures all possible paths a Tic-tac-toe game can take from a given starting position, and given a player's current turn. Let us assume that turns can be modelled using an infinite list. For example, here is an infinite list for game in which the <code>X</code> and <code>O</code> players take alternating turns.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 turns :: [Cell]
 turns = X:O:turns
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We first define a data structure for representing the possible paths a game can take. The data structure is a tree graph in which each node represents a game state (i.e., a <code>Board</code>), and can have any number of child trees (including zero).
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data DecisionTree = Move Board [DecisionTree] @deriving (Eq, Show)
+        <code class="haskell"><![CDATA[
+data DecisionTree = Move Board [DecisionTree] deriving (Eq, Show)
         ]]></code> 
         <text hooks="math"><![CDATA[ 
 Now, we can define a function that builds a decision tree given a starting game state and the player turn sequence. Notice that <code>nextMoves</code> takes a <code>Board</code> and a <code>Cell</code> (to indicate which player is taking a turn), and uses a list comprehension to choose only the board cells that are empty. For each empty cell, it adds a new board state to the list in which that position is filled with the specified player's symbol.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 nextMoves :: (Board, Cell) -> [Board]
 nextMoves (Board pcs, cell) = [move ((p, cell), Board pcs) | (p, E) <- pcs]
         ]]></code> 
         <text hooks="math"><![CDATA[ 
 Given a starting board and turn sequence, we can now build the tree of state spaces for the entire game.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 tree :: Board -> [Cell] -> DecisionTree
 tree b (turn:turns) = Move b [tree b' turns | b' <- nextMoves (b, turn)]
         ]]></code>
         <text hooks="math"><![CDATA[ 
 Suppose we have a function <code>win :: Cell -> Board -> Bool</code> that checks if a given board is already a win for a particular player. We can then add an <code>Ord</code> instance to compare boards from player <code>X</code>'s perspective: a board is "greater" (or "better") than another board if either the board is a win for <code>X</code>, or the other board is a loss for <code>O</code>.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@instance Ord Board @where
+        <code class="haskell"><![CDATA[
+instance Ord Board where
   b <= b' = win b' X || win b O
         ]]></code>
         <text hooks="math"><![CDATA[ 
@@ -4879,7 +4879,7 @@ Note an important distinction between ad hoc polymorphism and parametric polymor
         <text hooks="math"><![CDATA[ 
 Suppose we define a function <code>len</code> for computing lengths of lists of integers.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 len :: [Integer] -> Integer
 len []         = 0
 len ((:) x xs) = 1 + len xs
@@ -4887,7 +4887,7 @@ len ((:) x xs) = 1 + len xs
         <text hooks="math"><![CDATA[ 
 Unfortunately, we cannot use the above function to compute the length of a list of, e.g., <code>Bool</code> values because the type <code>[Integer]</code> does not unify with the type <code>[Bool]</code>. We could write an alternative type to address this.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 len :: [Bool] -> Integer
 len []         = 0
 len ((:) x xs) = 1 + len xs
@@ -4895,7 +4895,7 @@ len ((:) x xs) = 1 + len xs
         <text hooks="math"><![CDATA[ 
 We can now use <code>len</code> on lists of type <code>[Bool]</code>, but we can no longer use it on lists of type <code>[Integer]</code>. Notice that the only thing that has changed is the type of the function; the body is the same in both cases. Haskell allows us to take advantage of this by employing a <i>type variable</i>.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 len :: [a] -> Integer
 len []         = 0
 len ((:) x xs) = 1 + len xs
@@ -4903,7 +4903,7 @@ len ((:) x xs) = 1 + len xs
         <text hooks="math"><![CDATA[ 
 With the above declaration, it is now possible to apply the <code>len</code> function to a list containing any type of element. This is because the type variable <code>a</code> unifies with any other type (including <code>Bool</code> and <code>Integer</code>), so the input type <code>[a]</code> will unify with both <code>[Integer]</code> and <code>[Bool]</code>, as well as types such as <code>[String -> String]</code> (a list of functions that take <code>String</code> inputs and return <code>String</code> outputs).
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> len [True, False, True]
 3
 *> len [1, 2, 3, 4, 5]
@@ -4919,13 +4919,13 @@ Since <code>len</code> is a function that can be applied to different input type
         <text hooks="math"><![CDATA[ 
 We can define a <code>Set</code> data structure for holding sets of <code>Integer</code> values that has an underlying list implementation.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@module IntegerSet @where
+        <code class="haskell"><![CDATA[
+module IntegerSet where
   
-@data Set =
+data Set =
     Empty
   | Set [Integer]
-  @deriving Show   
+  deriving Show   
  
 insert :: Set -> Integer -> Set
 insert (Set l) x = Set (x:l)
@@ -4938,10 +4938,10 @@ contains x (Set l) = x `elem` l
         <text hooks="math"><![CDATA[ 
 However, what if we also want user to have the option of using a data structure for sets that uses an underlying binary search tree implementation? We can first define a class for set data structures that specifies the signatures of the functions that a set data structure must support. We can even define new functions that rely only on the signature.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@module SetClass @where
+        <code class="haskell"><![CDATA[
+module SetClass where
 
-@class IsSet s @where
+class IsSet s where
   empty :: s
   insert :: s -> Integer -> s
   contains :: Integer -> s -> Bool
@@ -4953,17 +4953,17 @@ However, what if we also want user to have the option of using a data structure 
         <text hooks="math"><![CDATA[ 
 This makes it possible to provide two different implementations that are both members of this class.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@module IntegerSetList @where
+        <code class="haskell"><![CDATA[
+module IntegerSetList where
 
-@import SetClass
+import SetClass
   
-@data IntegerSetList =
+data IntegerSetList =
     Empty
   | Set [Integer]
-  @deriving Show   
+  deriving Show   
 
-@instance IsSet IntegerSetList @where
+instance IsSet IntegerSetList where
   empty = Empty
 
   insert (Set l) x = Set (x:l)
@@ -4972,33 +4972,33 @@ This makes it possible to provide two different implementations that are both me
   contains x (Empty) = False
   contains x (Set l) = x `elem` l
         ]]></code>
-        <code hooks="Haskell"><![CDATA[
-@module IntegerSetTree @where
+        <code class="haskell"><![CDATA[
+module IntegerSetTree where
 
-@import SetClass
+import SetClass
 
-@data IntegerSetTree =
+data IntegerSetTree =
     Leaf
   | Node Integer IntegerSetTree IntegerSetTree
-  @deriving Show   
+  deriving Show   
 
-@instance IsSet IntegerSetTree @where
+instance IsSet IntegerSetTree where
   empty = Leaf
 
   insert (Leaf       ) x = Node x Leaf Leaf
   insert (Node y s s') x =
-    @if x < y @then 
+    if x < y then 
       Node y (insert s x) s' 
-    @else
+    else
       Node y s (insert s' x)
 
   contains x (Leaf       ) = False
   contains x (Node y s s') =
-    @if y == x @then
+    if y == x then
       True
-    @else @if x < y @then
+    else if x < y then
       contains x s
-    @else
+    else
       contains x s'
         ]]></code>
       </example>
@@ -5009,13 +5009,13 @@ Haskell type classes need not contain types; they can also contain type construc
         <text hooks="math"><![CDATA[ 
 We can define a <code>Set</code> data structure for holding sets of values of any type <code>a</code>.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@module Set @where
+        <code class="haskell"><![CDATA[
+module Set where
   
-@data Set a =
+data Set a =
     Empty
   | Set [a]
-  @deriving Show   
+  deriving Show   
  
 insert :: Set a -> a -> Set a
 insert (Set l) x = Set (x:l)
@@ -5028,10 +5028,10 @@ contains x (Set l) = x `elem` l
         <text hooks="math"><![CDATA[ 
 However, what if we also want user to have the option of using a data structure for sets that uses an underlying binary search tree implementation? We can first define a class for set data structures that specifies the signatures of the functions that a set data structure must support. We can even define new functions that rely only on the signature.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@module SetClass @where
+        <code class="haskell"><![CDATA[
+module SetClass where
 
-@class IsSet s @where
+class IsSet s where
   empty :: s a
   insert :: Ord a => s a -> a -> s a
   contains :: (Ord a, Eq a) => a -> s a -> Bool
@@ -5043,17 +5043,17 @@ However, what if we also want user to have the option of using a data structure 
         <text hooks="math"><![CDATA[ 
 This makes it possible to provide two different implementations of polymorphic set data structures that are both members of this class. Notice that we added the <code>Ord a</code> constraint on the element type <code>a</code> in case we want to compare them (e.g., if we are using a binary search tree implementation of sets).
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@module SetList @where
+        <code class="haskell"><![CDATA[
+module SetList where
 
-@import SetClass
+import SetClass
   
-@data SetList a =
+data SetList a =
     Empty
   | Set [a]
-  @deriving Show   
+  deriving Show   
 
-@instance IsSet SetList @where
+instance IsSet SetList where
   empty = Empty
 
   insert (Set l) x = Set (x:l)
@@ -5062,33 +5062,33 @@ This makes it possible to provide two different implementations of polymorphic s
   contains x (Empty) = False
   contains x (Set l) = x `elem` l
         ]]></code>
-        <code hooks="Haskell"><![CDATA[
-@module SetTree @where
+        <code class="haskell"><![CDATA[
+module SetTree where
 
-@import SetClass
+import SetClass
 
-@data SetTree a =
+data SetTree a =
     Leaf
   | Node a (SetTree a) (SetTree a)
-  @deriving Show   
+  deriving Show   
 
-@instance IsSet SetTree @where
+instance IsSet SetTree where
   empty = Leaf
 
   insert (Leaf       ) x = Node x Leaf Leaf
   insert (Node y s s') x =
-    @if x < y @then 
+    if x < y then 
       Node y (insert s x) s' 
-    @else
+    else
       Node y s (insert s' x)
 
   contains x (Leaf       ) = False
   contains x (Node y s s') =
-    @if y == x @then
+    if y == x then
       True
-    @else @if x < y @then
+    else if x < y then
       contains x s
-    @else
+    else
       contains x s'
         ]]></code>
       </example>
@@ -5096,13 +5096,13 @@ This makes it possible to provide two different implementations of polymorphic s
         <text hooks="math"><![CDATA[ 
 Suppose we have a <code>Set</code> data structure for holding sets of values of any type <code>a</code> that has a corresponding <code>size :: Set a -> Int</code> function.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@module Set @where
+        <code class="haskell"><![CDATA[
+module Set where
   
-@data Set a =
+data Set a =
     Empty
   | Set [a]
-  @deriving (Eq, Show)   
+  deriving (Eq, Show)   
  
 size :: Set a -> Int
 size (Set l) = length l
@@ -5111,8 +5111,8 @@ size (Empty) = 0
         <text hooks="math"><![CDATA[ 
 We can make it possible to order sets by their size using the <code>&lt;</code> operator by making the type <code>Set a</code> (for any possible <code>a</code>) a member of the <code>Ord</code> type class.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@instance Eq a => Ord (Set a) @where
+        <code class="haskell"><![CDATA[
+instance Eq a => Ord (Set a) where
   s < s' = size s < size s'
         ]]></code>
         <text hooks="math"><![CDATA[ 
@@ -5145,7 +5145,7 @@ Defining the above operations on algebraic data types (including polymorphic alg
         <text hooks="math"><![CDATA[ 
 We can begin by implementing a <b>fold</b> operation on Haskell <code>Integer</code> lists that does nothing.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 fold :: [Integer] -> [Integer]
 fold []     = []
 fold (x:xs) = x : fold xs
@@ -5153,7 +5153,7 @@ fold (x:xs) = x : fold xs
         <text hooks="math"><![CDATA[ 
 We can modify the above to replace the two list constructors (i.e., <code>(:)</code> and <code>[]</code>) in the input list with a binary operator and a base case (in this case, <code>(+)</code> and <code>0</code>). This way, the <code>fold</code> function now computes the sum of the elements in the list.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 fold :: [Integer] -> Integer
 fold []     = 0
 fold (x:xs) = x + fold xs
@@ -5161,7 +5161,7 @@ fold (x:xs) = x + fold xs
         <text hooks="math"><![CDATA[ 
 We can further generalize the above so that it takes the two replacement functions as arguments. The two functions are a replacement for <code>(:)</code>, so it must be of type <code>Integer -> Integer -> Integer</code>, and a replacement for <code>[]</code>, which must be of type <code>Integer</code>.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 fold :: (Integer -> Integer -> Integer) -> Integer -> [Integer] -> Integer
 fold f b []     = b
 fold f b (x:xs) = f x (fold f b xs)
@@ -5169,7 +5169,7 @@ fold f b (x:xs) = f x (fold f b xs)
         <text hooks="math"><![CDATA[ 
 We can now use the above <code>fold</code> implementation to define many common functions on lists of integers.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 sum :: [Integer] -> Integer
 sum = fold (+) 0
 
@@ -5187,7 +5187,7 @@ minimum l = fold min (fold max 0 l) l
         <text hooks="math"><![CDATA[ 
 The fold function for the default right-associative list implementation supported by Haskell (i.e., with the built-in constructors <code>(:)</code> and <code>[]</code>) is called <code>foldr</code>.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 foldr :: (a -> b -> b) -> b -> [a] -> b
 foldr f base []     = base
 foldr f base (x:xs) = f x (foldr f base xs)
@@ -5195,7 +5195,7 @@ foldr f base (x:xs) = f x (foldr f base xs)
         <text hooks="math"><![CDATA[ 
 The <code>foldr</code> function can be used to implement many of the usual library functions one might find useful when working with lists, and this is what is done in the Haskell libraries. Below are some examples (some of these are simplified versions of what is actually found in the libraries).
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 sum :: Num a -> [a] -> a
 sum xs = foldr (+) 0 xs
 
@@ -5210,28 +5210,28 @@ maximum xs = foldr max 0 xs
         <text hooks="math"><![CDATA[ 
 We can implement any <b>map</b> operation as a fold. Suppose we want to add the constant <code>1</code> to every element in an <code>Integer</code> list. For example, we want to achieve the following using a call to <code>foldr</code>:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> [x + 1 | x <- [1,2,3,4,5]]
 [2,3,4,5,6]
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We can accomplish this by defining a modified list node constructor function that adds <code>1</code> to its first argument, then builds the list node:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 addOneThenCons :: Integer -> [Integer] -> [Integer]
 addOneThenCons x xs = (x + 1) : xs
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We can now use the above together with <code>foldr</code>:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> foldr addOneThenCons [] [1,2,3,4,5]
 [2,3,4,5,6]
         ]]></code>
         <text hooks="math"><![CDATA[ 
 Using \lambda abstractions, we can avoid having to explicitly define <code>addOneThenCons</code>:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> foldr (\x xs -> (x+1) : xs) [] [1,2,3,4,5]
 [2,3,4,5,6]
         ]]></code>
@@ -5240,29 +5240,29 @@ Using \lambda abstractions, we can avoid having to explicitly define <code>addOn
         <text hooks="math"><![CDATA[ 
 We can implement any <b>filter</b> operation as a fold. For example, suppose we want to only keep positive integers from an integer list:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> [x | x <- [-3,-2,-1,0,1,2,3], x > 0]
 [1,2,3]
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We can accomplish this by defining a modified list node constructor function that only adds a new list node if the data inside it is a positive integer:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 consIfPositive :: Integer -> [Integer] -> [Integer]
-consIfPositive x xs = @if x > 0 @then x : xs @else xs
+consIfPositive x xs = if x > 0 then x : xs else xs
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We can now use the above together with <code>foldr</code>:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> foldr consIfPositive [] [-3,-2,-1,0,1,2,3]
 [1,2,3]
         ]]></code>
         <text hooks="math"><![CDATA[ 
 Using \lambda abstractions, we can avoid having to explicitly define <code>consIfPositive</code>:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-*> foldr (\x xs -> @if x > 0 @then x : xs @else xs) [] [-3,-2,-1,0,1,2,3]
+        <code class="haskell"><![CDATA[
+*> foldr (\x xs -> if x > 0 then x : xs else xs) [] [-3,-2,-1,0,1,2,3]
 [1,2,3]
         ]]></code>
       </example> 
@@ -5270,7 +5270,7 @@ Using \lambda abstractions, we can avoid having to explicitly define <code>consI
         <text hooks="math"><![CDATA[ 
 We can implement an easily parallelizable version of quicksort using <b>filter</b> operations:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 qsort :: [Integer] -> [Integer]
 qsort []     = []
 qsort (x:xs) = qsort [y | y <- xs, y < x] ++ [x] ++ qsort [y | y <- xs, y >= x]
@@ -5280,7 +5280,7 @@ qsort (x:xs) = qsort [y | y <- xs, y < x] ++ [x] ++ qsort [y | y <- xs, y >= x]
         <text hooks="math"><![CDATA[ 
 We can implement a <b>fold</b> operation that works for associative binary operators that recursively splits the problem into two parts over and over until a base case is reached.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 fold :: (a -> a -> a) -> a -> [a] -> a
 fold f b []  = b
 fold f b [x] = x
@@ -5299,7 +5299,7 @@ SQL-like languages (as well as the <a href="http://en.wikipedia.org/wiki/Relatio
 <br/><br/>
 For example, suppose an SQL table consists of some number of rows, and each row has an entry of the form <code>(Name, Age)</code>:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="SQL"><![CDATA[
 +---------------+
 |    People     |
 +---------------+
@@ -5313,8 +5313,8 @@ For example, suppose an SQL table consists of some number of rows, and each row 
         <text hooks="math"><![CDATA[ 
 The following SQL query allows a user to retrieve only the <code>Name</code> entries in the table; this query amounts to a <b>map</b> operation:
         ]]></text>
-        <code hooks="SQL"><![CDATA[
-> @SELECT Name @FROM People
+        <code class="sql"><![CDATA[
+> SELECT Name from People
 
 +-------+
 | Name  |
@@ -5327,8 +5327,8 @@ The following SQL query allows a user to retrieve only the <code>Name</code> ent
         <text hooks="math"><![CDATA[ 
 The following SQL query allows a user to retrieve only the entries within a certain <code>Age</code> range; this query amounts to a <b>filter</b> operation:
         ]]></text>
-        <code hooks="SQL"><![CDATA[
-> @SELECT * @FROM People @WHERE Age >= 18
+        <code class="sql"><![CDATA[
+> SELECT * from People where Age >= 18
 
 +---------------+
 | Name  |  Age  |
@@ -5340,8 +5340,8 @@ The following SQL query allows a user to retrieve only the entries within a cert
         <text hooks="math"><![CDATA[ 
 The following SQL query allows a user to retrieve the sum of the <code>Age</code> fields of all the entries; this query amounts to <b>fold</b> operation (it is often called an aggregation operation):
         ]]></text>
-        <code hooks="SQL"><![CDATA[
-> @SELECT @SUM(Age) @FROM People
+        <code class="sql"><![CDATA[
+> SELECT SUM(Age) from People
 
 +-------+
 |  Age  |
@@ -5352,17 +5352,17 @@ The following SQL query allows a user to retrieve the sum of the <code>Age</code
         <text hooks="math"><![CDATA[ 
 We can easily simulate all of the above capabilities using another language that supports the declarative and functional programming paradigms, such as Haskell. Suppose we have the following definitions:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@type Name = String
-@type Age = Integer
-@type Table = [(Name, Age)]
+        <code class="haskell"><![CDATA[
+type Name = String
+type Age = Integer
+type Table = [(Name, Age)]
 
 people = [("Alice", 20), ("Bob", 17), ("Carl", 23)]
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We can then perform the following queries:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> [name | (name, age) <- people]
 ["Alice", "Bob", "Carl"]
 
@@ -5375,7 +5375,7 @@ We can then perform the following queries:
         <text hooks="math"><![CDATA[ 
 Equivalently, we can use <code>map</code>, <code>filter</code>, <code>foldr</code>, and \lambda abstractions instead of list comprehensions (the Haskell compiler simply converts list comprehensions into some combination of these during compilation):
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> map (\(name, age) -> name) people
 ["Alice", "Bob", "Carl"]
 
@@ -5391,31 +5391,31 @@ Equivalently, we can use <code>map</code>, <code>filter</code>, <code>foldr</cod
         <text hooks="math"><![CDATA[ 
 All of the above can also be done using Python list comprehensions:
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 >>> People = [("Alice", 20), ("Bob", 17), ("Carl", 23)]
 
->>> [name @for (name, age) @in People]
+>>> [name for (name, age) in People]
 ["Alice", "Bob", "Carl"]
 
->>> [(name, age) @for (name, age) @in People @if age >= 18]
+>>> [(name, age) for (name, age) in People if age >= 18]
 [('Alice', 20), ('Carl', 23)]
 
->>> @sum([age @for (name, age) @in People])
+>>> sum([age for (name, age) in People])
 60
         ]]></code>
         <text hooks="math"><![CDATA[ 
 Python also supports <code>map</code>, <code>filter</code>, <code>reduce</code> (similar to Haskell's <code>foldr</code>), and lambda abstractions:
         ]]></text>
-        <code hooks="Python"><![CDATA[
+        <code class="py"><![CDATA[
 
->>> @list(@map((@lambda person: person[0]), People))
+>>> list(map((lambda person: person[0]), People))
 ['Alice', 'Bob', 'Carl']
 
->>> @list(@filter((@lambda person: person[1] >= 18), People))
+>>> list(filter((lambda person: person[1] >= 18), People))
 [('Alice', 20), ('Carl', 23)]
 
->>> @from functools @import reduce
->>> reduce(@lambda x,y: x + y, [age @for (name, age) @in People])
+>>> from functools import reduce
+>>> reduce(lambda x,y: x + y, [age for (name, age) in People])
 60
         ]]></code>
       </example>
@@ -5427,10 +5427,10 @@ In jQuery, it is possible to select all the elements with a certain tag in an HT
 <br/><br/>
 For example, the following code selects all the <code>li</code> elements and updates the text content of each to indicate the item number corresponding to that element. Notice that the <code>.text()</code> function takes a function as an argument (the function supplied as an argument takes an index as an input and returns a string):
         ]]></text>
-        <code hooks="JavaScript"><![CDATA[
+        <code class="javascript"><![CDATA[
 $("ul li").text(
-  @function( index ) {
-    @return "item number " + ( index + 1 );
+  function( index ) {
+    return "item number " + ( index + 1 );
   }
 );
         ]]></code>
@@ -5448,30 +5448,30 @@ In this section we introduce several consequences of viewing programs as a colle
         <text hooks="math"><![CDATA[ 
 Suppose we have the following definition for a polymorphic data type <code>Tree a</code>:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data Tree a =
+        <code class="haskell"><![CDATA[
+data Tree a =
     Node a (Tree a) (Tree a)
   | Leaf
-  @deriving Show
+  deriving Show
         ]]></code>
         <text hooks="math"><![CDATA[ 
 To determine how to put together a <code>foldTree</code> function for values of type <code>Tree a</code>, we first list all the constructors for <code>Tree a</code> (we could also get this information using the <code>:t</code> command in GHCi):
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 Node :: a -> Tree a -> Tree a -> Tree a
 Leaf :: Tree a
         ]]></code>
         <text hooks="math"><![CDATA[ 
 A fold function will simply replace all instances of <code>Node</code> and <code>Leaf</code> in a tree with different value or function (for example, let's call <code>Node</code>'s replacement <code>n</code> and <code>Leaf</code>'s replacement <code>l</code>); this means that the replacement values and functions must have a type that has the same structure (i.e., they must take the same number of arguments) as the constructors they replace. However, they will fold into some new type of value <code>b</code>, so we replace every instance of <code>Tree a</code> with the new result type <code>b</code>:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 n :: a -> b -> b -> b
 l :: b
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We can now write our <code>foldTree</code> function to take the above two arguments, and then the tree that is being folded as the last argument. Every <code>Node</code> will be replaced with <code>n</code> and every <code>Leaf</code> will be replaced with <code>l</code>. Notice that in the case of <code>Node</code>, we also recursively fold the trees, since we need to turn them into the result type <code>b</code> before we can apply <code>n :: a -> b -> b -> b</code>.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 foldTree :: (a -> b -> b -> b) -> b -> Tree a -> b
 foldTree n l (Node x t1 t2) = n x (foldTree n l t1) (foldTree n l t2)
 foldTree n l Leaf           = l
@@ -5479,7 +5479,7 @@ foldTree n l Leaf           = l
         <text hooks="math"><![CDATA[ 
 Notice that a <code>mapTree</code> function is just a special case of fold in which <code>n x t1 t2 = Node (f x) t1 t2</code> for some function <code>f</code>, and where <code>l = Leaf</code>, since we want to change each value of type <code>a</code> inside the tree, but not the nodes of the tree themselves. This also means we no longer need <code>n</code> and <code>l</code> as arguments; we only need <code>f</code>.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 mapTree :: (a -> c) -> (Tree a -> Tree c)
 mapTree f (Node x t1 t2) = Node (f x) (mapTree f t1) (mapTree f t2)
 mapTree f Leaf           = Leaf
@@ -5487,13 +5487,13 @@ mapTree f Leaf           = Leaf
         <text hooks="math"><![CDATA[ 
 To reiterate, notice that the relationship between the two function is <code>mapTree f = foldTree (\x -> Node (f x)) Leaf</code> (and we could have defined <code>mapTree</code> in this way):
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 mapTree f = foldTree (\x -> Node (f x)) Leaf
         ]]></code>
         <text hooks="math"><![CDATA[ 
 In the above, we are taking advantage of Haskell's support for partially applying functions, since <code>Node</code> is partially applied to its result, which means <code>Node (f x)</code> is a function still waiting for two more arguments (the two subtrees). Alternatively but equivalently, we could have written the below definition:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 mapTree f t = foldTree (\x t1 t2 -> Node (f x) t1 t2) Leaf t
         ]]></code>
       </example>
@@ -5501,19 +5501,19 @@ mapTree f t = foldTree (\x t1 t2 -> Node (f x) t1 t2) Leaf t
         <text hooks="math"><![CDATA[
 Common operations on abstract syntax trees (such as evaluation and execution) can also be represented as fold operations. Suppose we have the following implementation for an abstract syntax for formulas (which we have seen in <a href="#beb651b8549a4706a411ce0af3cd0010">previous examples</a>):
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data Formula = 
+        <code class="haskell"><![CDATA[
+data Formula = 
     T
   | F
   | Not Formula
   | And Formula Formula
   | Or Formula Formula
-  @deriving Show
+  deriving Show
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We first list all the constructors for <code>Formula</code> (we could also get this information using the <code>:t</code> command in GHCi):
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 T :: Formula
 F :: Formula
 Not :: Formula -> Formula
@@ -5523,7 +5523,7 @@ Or :: Formula -> Formula -> Formula
         <text hooks="math"><![CDATA[ 
 A fold function will simply replace all instances of each constructor in a tree with different value or function (for example, let's call <code>And</code>'s replacement <code>a</code> and <code>T</code>'s replacement <code>t</code>); this means that the replacement values and functions must have a type that has the same structure (i.e., they must take the same number of arguments) as the constructors they replace. However, they will fold into some new type of value <code>b</code>, so we replace every instance of <code>Formula</code> with the new result type <code>b</code>:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 t :: b
 f :: b
 n :: b -> b
@@ -5533,7 +5533,7 @@ o :: b -> b -> b
         <text hooks="math"><![CDATA[ 
 We can now write our <code>foldFormula</code> function to take the above five arguments, and then the formula tree that is being folded as the last argument.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 foldFormula :: b -> b -> (b -> b) -> (b -> b -> b) -> (b -> b -> b) -> Formula -> b
 foldFormula t f n a o (T          ) = t
 foldFormula t f n a o (F          ) = f
@@ -5544,7 +5544,7 @@ foldFormula t f n a o (Or  f1 f2  ) = o (foldFormula t f n a o f1) (foldFormula 
         <text hooks="math"><![CDATA[ 
 We can now implement two evaluation algorithms easily: one that evaluates the tree as a native Haskell <code>Bool</code> result, and one that evaluates the tree as a native Haskell <code>Int</code> result:
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 evalAsBool :: Formula -> Bool
 evalAsBool = foldFormula True False not (&&) (||) 
 
@@ -5554,19 +5554,19 @@ evalAsInt = foldFormula 1 0 ((-) 1) (*) max
         <text hooks="math"><![CDATA[ 
 Notice that the <code>foldFormula</code> function acts as a form of encapsulation for the <code>Formula</code> data structure. Suppose we want to change the data type definition to the following (using a terminology for formulas that corresponds to terminology from the study of logic):
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data Formula = 
+        <code class="haskell"><![CDATA[
+data Formula = 
     Top
   | Bottom
   | Neg Formula
   | Conj Formula Formula
   | Disj Formula Formula
-  @deriving Show
+  deriving Show
         ]]></code>
         <text hooks="math"><![CDATA[ 
 We could then change the definition of <code>foldFormula</code> once, and would not need to change our implementations of <code>evalAsBool</code> and <code>evalAsInt</code> at all.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 foldFormula :: b -> b -> (b -> b) -> (b -> b -> b) -> (b -> b -> b) -> Formula -> b
 foldFormula t f n a o (Top         ) = t
 foldFormula t f n a o (Bottom      ) = f
@@ -5575,18 +5575,11 @@ foldFormula t f n a o (Conj f1 f2  ) = a (foldFormula t f n a o f1) (foldFormula
 foldFormula t f n a o (Disj  f1 f2 ) = o (foldFormula t f n a o f1) (foldFormula t f n a o f2)
         ]]></code>
       </example>
-      
-      
-      
-      
-      
-      
-      
       <example required="true" id="123b1d495c5f4c03827519c53ad95ee2">
         <text hooks="math"><![CDATA[
 Suppose we are working with functions that may not always successfully return a result. We may want to document this in the type of each function. For example, suppose we have the following functions.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 neg :: Integer -> Integer
 neg n = -1 * n
         
@@ -5599,13 +5592,13 @@ log2 _ = -1 -- Undefined in all other cases.
         <text hooks="math"><![CDATA[
 One problem with the definition of <code>log2</code> is that the output <code>-1</code> is ambiguous: it may be an actual result or an error. We can document that this result is exceptional by introducing a new parametric polymorphic data type that allows us to return either a result or a constructor indicating that there is no result. In the Haskell <code>Prelude</code>, the <code>Maybe a</code> data type is defined for such situations (although we could create our own, as well).
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
-@data Maybe a = Just a | Nothing
+        <code class="haskell"><![CDATA[
+data Maybe a = Just a | Nothing
         ]]></code>
         <text hooks="math"><![CDATA[
 We can now modify our implementation for <code>log2</code>.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 log2 :: Integer -> Maybe Integer
 log2 1 = Just 0
 log2 2 = Just 1
@@ -5615,7 +5608,7 @@ log2 _ = Nothing
         <text hooks="math"><![CDATA[
 However, we then run into a problem: we can no longer apply another function like <code>neg</code> directly to the result of <code>log2</code> because <code>Maybe Integer</code> and <code>Integer</code> do not unify, so the Haskell type inference rule for function application is not satisfied. To address this, we can create a parametric polymorphic <i>map</i> function for <code>Maybe a</code>.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 mapMaybe :: (a -> b) -> (Maybe a -> Maybe b)
 mapMaybe f (Just x ) = Just (f x)
 mapMaybe f (Nothing) = Nothing
@@ -5623,7 +5616,7 @@ mapMaybe f (Nothing) = Nothing
         <text hooks="math"><![CDATA[
 We can now apply <code>neg</code> to an input of type <code>Maybe Integer</code>.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> (mapMaybe neg) (log2 (-2))
 Nothing
 *> (mapMaybe neg) (log2 4)
@@ -5632,21 +5625,21 @@ Just (-2)
         <text hooks="math"><![CDATA[
 Since <code>mapMaybe</code> can be described as "lifting" a function of type <code>a -> b</code> to a more powerful function <code>Maybe a -> Maybe b</code>, another common name for the map operation is <i>lift</i>.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 liftMaybe :: (a -> b) -> (Maybe a -> Maybe b)
 liftMaybe = mapMaybe
         ]]></code>
         <text hooks="math"><![CDATA[
 There is one more problem with this approach, however. What if we want to compose two functions that might both return results that are erroneous or undefined? We can see that we run into a problem.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> :t (liftMaybe log2) (log2 (-2))
 Maybe (Maybe Integer)
         ]]></code>
         <text hooks="math"><![CDATA[
 However, we can address this by introducing another function that has a very natural definition, which we call a <i>join</i> operation.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 joinMaybe :: Maybe (Maybe a) -> Maybe a
 joinMaybe (Just (Just x)) = Just x
 joinMaybe (Just Nothing ) = Nothing
@@ -5655,7 +5648,7 @@ joinMaybe (Nothing      ) = Nothing
         <text hooks="math"><![CDATA[
 We can now combine multiple operations and still obtain a result of type <code>Maybe a</code>.
         ]]></text>
-        <code hooks="Haskell"><![CDATA[
+        <code class="haskell"><![CDATA[
 *> joinMaybe $ (liftMaybe log2) (log2 (-2))
 Nothing
         ]]></code>
@@ -5676,15 +5669,15 @@ This section contains a collection of review problems going over all the course 
       <text hooks="math"><![CDATA[
 Suppose you are given the following type definitions for representing simple English sentences:
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@type Noun = String
-@type Adjective = String
-@type Verb = String
-@type Adverb = String
+      <code class="haskell"><![CDATA[
+type Noun = String
+type Adjective = String
+type Verb = String
+type Adverb = String
 
-@data NounPhrase = AN Adjective NounPhrase | N Noun
-@data VerbPhrase = AV Adverb VerbPhrase | V Verb
-@data Sentence = S NounPhrase VerbPhrase
+data NounPhrase = AN Adjective NounPhrase | N Noun
+data VerbPhrase = AV Adverb VerbPhrase | V Verb
+data Sentence = S NounPhrase VerbPhrase
       ]]></code>
       <orderedlist style="list-style-type:lower-alpha">
         <item>
@@ -5724,8 +5717,8 @@ number %n & ::= & <b>0</b> | <b>1</b> | ... | <b>9</b> \\
       <text hooks="math"><![CDATA[
 Write down a fold function for the follow data type.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@data Tree =
+      <code class="haskell"><![CDATA[
+data Tree =
       Red Tree Tree 
     | Blue Tree Tree 
     | Green Integer
@@ -5984,7 +5977,7 @@ You assemble your assignment solution file(s) on your own computer or device.
           <text><![CDATA[
 You log into <code>csa2</code> or <code>csa3</code> using an SCP or SSH client and create a directory for your submission in your CS account home directory. Note that in the examples below <code>%&gt;</code> represents a terminal prompt, which may look different on your system.
           ]]></text>
-          <code hooks="Python"><![CDATA[
+          <code class="py"><![CDATA[
 %> cd ~
 %> mkdir hw1
           ]]></code>
@@ -6077,7 +6070,7 @@ If you have not already done so (e.g., if you were using an SSH client in the pr
           <text><![CDATA[
 If you have not already done so, you log into <code>csa2</code> or <code>csa3</code> using an SSH client and run the <code>gsubmit</code> commands to copy the files from your CS account home directory to the <code>gsubmit</code> directories to which the course staff has access.
           ]]></text>
-          <code hooks="Python"><![CDATA[
+          <code class="py"><![CDATA[
 %> cd ~
 %> gsubmit cs320 hw1
           ]]></code>
@@ -6141,19 +6134,19 @@ If you have not already done so, you log into <code>csa2</code> or <code>csa3</c
           <text><![CDATA[
 To view your submitted files, you can use the following command:
           ]]></text>
-          <code hooks="Python"><![CDATA[
+          <code class="py"><![CDATA[
 %> gsubmit cs320 -ls
           ]]></code>
           <text><![CDATA[
 To look at a file that has already been submitted, you can use:
           ]]></text>
-          <code hooks="Python"><![CDATA[
+          <code class="py"><![CDATA[
 %> gsubmit cs320 -cat hw1/hw1.py
           ]]></code>
           <text><![CDATA[
 <i>After</i> grades are posted (normally, this will be announced on the mailing list and in lecture), you can check your grade using:
           ]]></text>
-          <code hooks="Python"><![CDATA[
+          <code class="py"><![CDATA[
 %> gsubmit cs320 -cat grade.hw1.txt
           ]]></code>
         </item>
@@ -6173,35 +6166,35 @@ The latest version of Python 3 can be downloaded at: <b><a href="https://www.pyt
       <text><![CDATA[
 The simplest Python program is a single file (called a <i>module</i>) with the file extension <code>.py</code>. For example, suppose the following is contained within a file called <code>example.py</code>:
       ]]></text>
-      <code hooks="Python">
+      <code class="py"><![CDATA[
 # This is a comment in "example.py".
 # Below is a Python statement.
-@print("Hello, world.")
-      </code>
+print("Hello, world.")
+      ]]></code>
       <text><![CDATA[
 Assuming Python is installed on your system, to run the above program from the command line you can use the following (you may need to use <code>python3</code>, <code>python3.2</code>, <code>python3.3</code>, etc. depending on the Python installation you're using). Note that in the examples below <code>%&gt;</code> represents a terminal prompt, which may look different on your system.
       ]]></text>
-      <code hooks="Python">
+      <code class="py"><![CDATA[
 %> python example.py
 Hello, world.
-      </code>
+      ]]></code>
       <text><![CDATA[
 If you run Python without an argument on the command line, you will enter Python's interactive prompt. You can then evaluate expressions and execute individual statements using this prompt; you can also load and execute a Python module file:
       ]]></text>
-      <code hooks="Python">
+      <code class="py"><![CDATA[
 %> python
 Python 3.2 ...
 Type "help", "copyright", "credits" or "license" for more information.
->>> @exec(@open("example.py").read()) # Load "example.py" module.
+>>> exec(open("example.py").read()) # Load "example.py" module.
 Hello, world.
 >>> x = "Hello." # Execute an assignment statement.
->>> @print(x)     # Execute a "print" statement.
+>>> print(x)     # Execute a "print" statement.
 Hello.
 >>> x            # Evaluate a string expression.
 'Hello.'
 >>> 1 + 2        # Evaluate a numerical expression.
 3
-      </code>
+      ]]></code>
     </subsection>
     <subsection title="Common data structures (i.e., Python expressions)">
       <text><![CDATA[
@@ -6213,14 +6206,14 @@ Python provides native support for several data structures that we will use thro
           <unorderedlist>
             <item><![CDATA[The usual logical operations are available using the operators <code>and</code>, <code>or</code>, and <code>not</code>.]]></item>
           </unorderedlist>
-          <code hooks="Python">
->>> @True                                      # A boolean constant.
-@True
->>> @False                                     # A boolean constant.
-@False
->>> @True @and @False @or @True @and (@not @False)    # A boolean expression.
-@True
-          </code>
+          <code class="py"><![CDATA[
+>>> True                                      # A boolean constant.
+True
+>>> False                                     # A boolean constant.
+False
+>>> True and False or True and (not False)    # A boolean expression.
+True
+          ]]></code>
         </item>
         <item>
           <text><![CDATA[<b>Integers</b> are written as in most other programming languages (i.e., as a sequence of digits).]]></text>
@@ -6229,16 +6222,16 @@ Python provides native support for several data structures that we will use thro
             <item><![CDATA[The usual relational operators <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code> are available.]]></item>
             <item><![CDATA[The <code>int()</code> function can convert a string that looks like an integer into an integer.]]></item>
           </unorderedlist>
-          <code hooks="Python">
+          <code class="py"><![CDATA[
 >>> 123                                       # An integer constant.
 123
 >>> 1 * (2 + 3) // 4 - 5                      # An integer expression.
 -4
 >>> 4 * 5 >= 19                               # A boolean expression involving integers.
-@True
->>> @int("123")                                # A string being converted into an integer
+True
+>>> int("123")                                # A string being converted into an integer
 123
-          </code>
+          ]]></code>
         </item>
         <item>
           <text><![CDATA[<b>Strings</b> are delimited by either <code>'</code> or <code>"</code> characters. Strings can be treated as lists of single-character strings. Another way to look at this is that there is no distinction between a character and a string: all characters are just strings of length 1. Multiline strings can be delimited using <code>"""</code> or <code>'''</code> (i.e., three quotation mark characters at the beginning and end of the string literal).]]></text>
@@ -6248,18 +6241,18 @@ Python provides native support for several data structures that we will use thro
             <item><![CDATA[The function <code>len()</code> returns the length of a string.]]></item>
             <item><![CDATA[Individual characters in a string can be accessed using the bracketed index notation (e.g., <code>s[i]</code>). These characters are also strings themselves.]]></item>
           </unorderedlist>
-          <code hooks="Python">
+          <code class="py"><![CDATA[
 >>> 'Example.'                                # A string.
 'Example.'
 >>> "Example."                                # Alternate notation for a string.
 'Example.'
->>> @len("ABCD")                               # String length.
+>>> len("ABCD")                               # String length.
 4
 >>> "ABCD" + "EFG"                            # String concatenation.
 'ABCDEFG'
 >>> "ABCD"[2]                                 # Third character in the string.
 'C'
-          </code>
+          ]]></code>
         </item>
         <item>
           <text><![CDATA[<b>Lists</b> are similar to arrays: they are ordered sequences of objects and/or values. The entries of a list can be of a mixture of different types, and lists containing one or more objects are delimited using <code>[</code> and <code>]</code>, with the individual list entries separated by commas. Lists cannot be members of sets.]]></text>
@@ -6270,18 +6263,18 @@ Python provides native support for several data structures that we will use thro
             <item><![CDATA[Individual entries in a list can be accessed using the bracketed index notation (e.g., <code>a[i]</code>).]]></item>
             <item><![CDATA[To check if a value is in a list, use the <code>in</code> relational operator.]]></item>
           </unorderedlist>
-          <code hooks="Python">
+          <code class="py"><![CDATA[
 >>> [1,2,"A","B"]                             # A list.
 [1, 2, 'A', 'B']
 >>> [1, 2] + ['A','B']                        # Concatenating lists.
 [1, 2, 'A', 'B']
->>> @len([1,2,"A","B"] )                       # List length.
+>>> len([1,2,"A","B"] )                       # List length.
 4
 >>> [1,2,"A","B"][0]                          # First entry in the list.
 1
->>> 1 @in [1, 2]                               # List containment check.
-@True
-          </code>
+>>> 1 in [1, 2]                               # List containment check.
+True
+          ]]></code>
         </item>
         <item>
           <text><![CDATA[<b>Tuples</b> are similar to lists (they are ordered, and can contain objects of different types), except they are delimited by parentheses <code>(</code> and <code>)</code>, with entries separated by commas. The main distinction between lists and tuples is that tuples are hashable (i.e., they can be members of sets).]]></text>
@@ -6295,24 +6288,24 @@ Python provides native support for several data structures that we will use thro
             <item><![CDATA[Individual entries in a tuple can be accessed using the bracketed index notation (e.g., <code>t[i]</code>).]]></item>
             <item><![CDATA[To check if a value is in a tuple, use the <code>in</code> relational operator.]]></item>
           </unorderedlist>
-          <code hooks="Python">
+          <code class="py"><![CDATA[
 >>> (1,2,"A","B")                             # A tuple.
 (1, 2, 'A', 'B')
 >>> (1,)                                      # Another tuple.
 (1,)
 >>> (1, 2) + ('A','B')                        # Concatenating tuples.
 (1, 2, 'A', 'B')
->>> @list((1, 2, 'A','B'))                     # A tuple being converted into a list.
+>>> list((1, 2, 'A','B'))                     # A tuple being converted into a list.
 [1, 2, 'A', 'B']
->>> @tuple([1, 2, 'A','B'])                    # A list being converted into a tuple.
+>>> tuple([1, 2, 'A','B'])                    # A list being converted into a tuple.
 (1, 2, 'A', 'B')
->>> @len((1,2,"A","B"))                        # Tuple length.
+>>> len((1,2,"A","B"))                        # Tuple length.
 4
 >>> (1,2,"A","B")[0]                          # First entry in the tuple.
 1
->>> 1 @in (1, 2)                               # Tuple containment check.
-@True
-          </code>
+>>> 1 in (1, 2)                               # Tuple containment check.
+True
+          ]]></code>
         </item>
         <item>
           <text><![CDATA[<b>Sets</b> are unordered sequences that cannot contain duplicates. They are a close approximation of mathematical sets. Sets cannot be members of sets.]]></text>
@@ -6325,27 +6318,27 @@ Python provides native support for several data structures that we will use thro
             <item><![CDATA[To access individual entries in a set, it is necessary to turn the set into a list or tuple.]]></item>
             <item><![CDATA[To check if a value is in a set, use the <code>in</code> relational operator.]]></item>
           </unorderedlist>
-          <code hooks="Python">
+          <code class="py"><![CDATA[
 >>> {1,2,"A","B"}                             # A set.
 {1, 2, 'A', 'B'}
 >>> ({1,2}.union({3,4})).intersection({4,5})  # Set operations.
 {4}
->>> @set([1, 2]).union(@set(('A','B')))         # Converting a list and a tuple to sets.
+>>> set([1, 2]).union(set(('A','B')))         # Converting a list and a tuple to sets.
 {'A', 1, 2, 'B'}
->>> @len({1,2,"A","B"})                        # Set size.
+>>> len({1,2,"A","B"})                        # Set size.
 4
->>> 1 @in {1,2,"A","B"}                        # Tuple containment check.
-@True
-          </code>
+>>> 1 in {1,2,"A","B"}                        # Tuple containment check.
+True
+          ]]></code>
         </item>
         <item>
           <text><![CDATA[<b>Frozen sets</b> are like sets, except they can be members of other sets. A set can be turned into a frozen set using the <code>frozenset()</code> function.]]></text>
-          <code hooks="Python">
->>> @frozenset({1,2,3})                        # A frozen set.
-@frozenset({1, 2, 3})
->>> {@frozenset({1,2}), @frozenset({3,4})}      # Set of frozen sets.
-{@frozenset({3, 4}), @frozenset({1, 2})}
-          </code>
+          <code class="py"><![CDATA[
+>>> frozenset({1,2,3})                        # A frozen set.
+frozenset({1, 2, 3})
+>>> {frozenset({1,2}), frozenset({3,4})}      # Set of frozen sets.
+{frozenset({3, 4}), frozenset({1, 2})}
+          ]]></code>
         </item>
         <item>
           <text><![CDATA[<b>Dictionaries</b> are unordered collections of associations between some set of keys and some set of values. Dictionaries are also known as finite maps.]]></text>
@@ -6356,18 +6349,18 @@ Python provides native support for several data structures that we will use thro
             <item><![CDATA[The function <code>len()</code> returns the number of entries in the dictionary.]]></item>
             <item><![CDATA[Individual entries in a dictionary can be accessed using the bracketed index notation (e.g., <code>d[key]</code>).]]></item>
           </unorderedlist>
-          <code hooks="Python">
+          <code class="py"><![CDATA[
 >>> {"A":1, "B":2}                            # A dictionary.
 {'A': 1, 'B': 2}
->>> @list({"A":1, "B":2}.keys())               # Dictionary keys.
+>>> list({"A":1, "B":2}.keys())               # Dictionary keys.
 ['A', 'B']
->>> @list({"A":1, "B":2}.values())             # Dictionary values.
+>>> list({"A":1, "B":2}.values())             # Dictionary values.
 [1, 2]
->>> @len({"A":1, "B":2})                       # Dictionary size.
+>>> len({"A":1, "B":2})                       # Dictionary size.
 2
 >>> {"A":1, "B":2}["A"]                       # Obtain a dictionary value using a key.
 1
-          </code>
+          ]]></code>
         </item>
       </unorderedlist>
     </subsection>
@@ -6380,11 +6373,11 @@ Python provides a variety of ways to supply parameter arguments when invoking fu
           <text><![CDATA[
  <b>Function calls and method/procedure invocations</b> consist of the function, procedure, or method name followed by a parenthesized, comma-delimited list of arguments. For example, suppose a function or procedure <code>example()</code> is defined as follows:
           ]]></text>
-          <code hooks="Python">
-@def example(x, y, z):
-  @print("Invoked.")
-  @return x + y + z
-          </code>
+          <code class="py"><![CDATA[
+def example(x, y, z):
+  print("Invoked.")
+  return x + y + z
+          ]]></code>
           <text><![CDATA[
     To invoke the above definition, we can use one of the following techniques.
           ]]></text>
@@ -6393,33 +6386,33 @@ Python provides a variety of ways to supply parameter arguments when invoking fu
               <text><![CDATA[
 <b>Passing arguments directly</b> involves listing the comma-delimited arguments directly between parentheses.
               ]]></text>
-              <code hooks="Python">
+              <code class="py"><![CDATA[
 >>> example(1,2,3)
 Invoked.
 6
-              </code>
+              ]]></code>
             </item>
             <item>
               <text><![CDATA[
 <b>The argument unpacking operator</b> (also known as the <code>*</code>-operator, the <b>scatter</b> operator, or the <b>splat</b> operator) involves providing a list to the function, preceded by the <code>*</code> symbol; the arguments will be drawn from the elements in the list.
               ]]></text>
-              <code hooks="Python">
+              <code class="py"><![CDATA[
 >>> args = [1,2,3]
 >>> example(*args)
 Invoked.
 6
-              </code>
+              ]]></code>
             </item>
            <item>
               <text><![CDATA[
 <b>The keyword argument unpacking operator</b> (also known as the <code>**</code>-operator) involves providing a dictionary to the function, preceded by the <code>**</code> symbol; each named paramter in the function definition will be looked up in the dictionary, and the value associated with that dictionary key will be used as the argument passed to that parameter.
               ]]></text>
-              <code hooks="Python">
+              <code class="py"><![CDATA[
 >>> args = {'z':3, 'x':1, 'y':2}
 >>> example(**args)
 Invoked.
 6
-              </code>
+              ]]></code>
             </item>
           </unorderedlist>
         </item>
@@ -6427,21 +6420,21 @@ Invoked.
           <text><![CDATA[
 <b>Default parameter values</b> can be specified in any definition. Suppose the following definition is provided.
           ]]></text>
-          <code hooks="Python">
-@def example(x = 1, y = 2, z = 3):
-  @return x + y + z
-          </code>
+          <code class="py"><![CDATA[
+def example(x = 1, y = 2, z = 3):
+  return x + y + z
+          ]]></code>
           <text><![CDATA[
 The behavior is then as follows: if an argument corresponding to a parameter is not supplied, the default value found in the definition is used. If an argument is supplied, the supplied argument value is used.
           ]]></text>
-          <code hooks="Python">
+          <code class="py"><![CDATA[
 >>> example(0, 0)
 3
 >>> example(0)
 5
 >>> example()
 6
-          </code>
+          ]]></code>
         </item>
       </unorderedlist>
     </subsection>
@@ -6452,35 +6445,35 @@ Python provides concise notations for defining data structures and performing lo
       <unorderedlist>
         <item>
           <text><![CDATA[<b>List comprehensions</b> make it possible to construct a list by iterating over one or more other data structure instances (such as a list, tuple, set, or dictionary) and performing some operation on each element or combination of elements. The resulting list will contain the result of evaluating the body for every combination.]]></text>
-          <code hooks="Python">
->>> [ x @for x @in [1,2,3] ]
+          <code class="py"><![CDATA[
+>>> [ x for x in [1,2,3] ]
 [1, 2, 3]
->>> [ 2 * x @for x @in {1,2,3} ]
+>>> [ 2 * x for x in {1,2,3} ]
 [2, 4, 6]
->>> [ x + y @for x @in {1,2,3} @for y @in (1,2,3) ]
+>>> [ x + y for x in {1,2,3} for y in (1,2,3) ]
 [2, 3, 4, 3, 4, 5, 4, 5, 6]
-          </code>
+          ]]></code>
           <text><![CDATA[It is also possible to add conditions anywhere after the first <code>for</code> clause. This will filter which combinations are actually used to add a value to the resulting list.]]></text>
-          <code hooks="Python"><![CDATA[
->>> [ x @for x @in {1,2,3} @if x < 3 ]
+          <code class="py"><![CDATA[
+>>> [ x for x in {1,2,3} if x < 3 ]
 [1, 2]
->>> [ x + y @for x @in {1,2,3} @for y @in (1,2,3) @if x > 2 @and y > 1 ]
+>>> [ x + y for x in {1,2,3} for y in (1,2,3) if x > 2 and y > 1 ]
 [5, 6]
           ]]></code>
         </item>
         <item>
           <text><![CDATA[<b>Set comprehensions</b> make it possible to construct a set by iterating over one or more other data structure instances (such as a list, tuple, set, or dictionary) and performing some operation on each element or combination of elements. The resulting list will contain the result of evaluating the body for every combination. Notice that the result will contain no duplicates because the result is a set.]]></text>
-          <code hooks="Python">
->>> { x @for x @in [1,2,3,1,2,3] }
+          <code class="py"><![CDATA[
+>>> { x for x in [1,2,3,1,2,3] }
 {1, 2, 3}
-          </code>
+          ]]></code>
         </item>
         <item>
           <text><![CDATA[<b>Dictionary comprehensions</b> make it possible to construct a dictionary by iterating over one or more other data structure instances (such as a list, tuple, set, or dictionary) and performing some operation on each element or combination of elements. The resulting dictionary will contain the result of evaluating the body for every combination.]]></text>
-          <code hooks="Python">
->>> { key : 2 @for key @in ["A","B","C"] }
+          <code class="py"><![CDATA[
+>>> { key : 2 for key in ["A","B","C"] }
 {'A': 2, 'C': 2, 'B': 2}
-          </code>
+          ]]></code>
         </item>
       </unorderedlist>
     </subsection>
@@ -6488,22 +6481,22 @@ Python provides concise notations for defining data structures and performing lo
       <text><![CDATA[
 The built-in function <code>type()</code> can be used to determine the type of a value. Below, we provide examples of how to check whether a given expression has one of the common Python types:
       ]]></text>
-      <code hooks="Python">
->>> @type(@True) == @bool
-@True
->>> @type(123) == @int
-@True
->>> @type("ABC") == @str
-@True
->>> @type([1,2,3]) == @list
-@True
->>> @type(("A",1,{1,2})) == @tuple
-@True
->>> @type({1,2,3}) == @set
-@True
->>> @type({"A":1, "B":2}) == @dict
-@True
-      </code>
+      <code class="py"><![CDATA[
+>>> type(True) == bool
+True
+>>> type(123) == int
+True
+>>> type("ABC") == str
+True
+>>> type([1,2,3]) == list
+True
+>>> type(("A",1,{1,2})) == tuple
+True
+>>> type({1,2,3}) == set
+True
+>>> type({"A":1, "B":2}) == dict
+True
+      ]]></code>
     </subsection>
     <subsection title="Common Python definition and control constructs (i.e., Python statements)">
       <text><![CDATA[
@@ -6512,32 +6505,32 @@ A Python program is a sequence of Python statements. Each statement is either a 
       <unorderedlist>
         <item>
           <text><![CDATA[<b>Variable assignments</b> make it possible to assign a value or object to a variable.]]></text>
-          <code hooks="Python">
+          <code class="py"><![CDATA[
 x = 10
-          </code>
+          ]]></code>
           <text><![CDATA[It is also possible to assign a tuple (or any computation that produces a tuple) to another tuple:]]></text>
-          <code hooks="Python">
+          <code class="py"><![CDATA[
 (x, y) = (1, 2)
-          </code>
+          ]]></code>
         </item>
         <item>
           <text><![CDATA[<b>Function and procedure definitions</b> consist of the <code>def</code> keyword, followed by the name of the function or procedure, and then by one or more arguments (delimited by parentheses and separated by commas).]]></text>
-          <code hooks="Python">
-@def example(a, b, c):
-    @return a + b + c
-          </code>
+          <code class="py"><![CDATA[
+def example(a, b, c):
+    return a + b + c
+          ]]></code>
         </item>
         <item>
           <text><![CDATA[<b>Conditional statements</b> consist of one or more branches, each with its own boolean expression as the condition (with the exception of <code>else</code>). The body of each branch is an indented sequence of statements.]]></text>
-          <code hooks="Python"><![CDATA[
-@def fibonacci(n):
+          <code class="py"><![CDATA[
+def fibonacci(n):
     # Computes the nth Fibonacci number.
-    @if n <= 0:
-        @return 0
-    @elif n <= 2:
-        @return 1
-    @else:
-        @return fibonacci(n-1) + fibonacci(n-2)
+    if n <= 0:
+        return 0
+    elif n <= 2:
+        return 1
+    else:
+        return fibonacci(n-1) + fibonacci(n-2)
           ]]></code>
         </item>
         <item>
@@ -6545,48 +6538,48 @@ x = 10
           <unorderedlist>
             <item>
               <text><![CDATA[The <b>while</b> construct has a boolean expression as its condition (much like <code>if</code>). The body is executed over and over until the expression in the condition evaluates to <code>False</code>, or a <code>break</code> statement is encountered.]]></text>
-              <code hooks="Python"><![CDATA[
-@def example1(n):
+              <code class="py"><![CDATA[
+def example1(n):
     # Takes an integer n and returns the sum of
     # the integers from 1 to n-1.
     i = 0
     sum = 0
-    @while i < n:
+    while i < n:
         sum = sum + i
         i = i + 1
-    @return sum
+    return sum
 
-@def example2(n):
+def example2(n):
     # Takes an integer n and returns the sum of
     # the integers from 1 to n-1.
     i = 0
     sum = 0
-    @while True:
+    while True:
         sum = sum + i
         i = i + 1
-        @if i == n:
-            @break
-    @return sum
+        if i == n:
+            break
+    return sum
               ]]></code>
             </item>
             <item>
               <text><![CDATA[The <b>for</b> construct makes it possible to repeat a sequence of statements once for every object in a list, tuple, or set, or once for every key in a dictionary.]]></text>
-              <code hooks="Python"><![CDATA[
-@def example3(n):
+              <code class="py"><![CDATA[
+def example3(n):
     # Takes an integer n and returns the sum of
     # the integers from 1 to n-1.
     sum = 0
-    @for i @in @range(0,n):
+    for i in range(0,n):
         sum = sum + i
-    @return sum
+    return sum
 
-@def example4(d):
+def example4(d):
     # Takes a dictionary d that maps keys to
     # integers and returns the sum of the integers.
     sum = 0
-    @for key @in d:
+    for key in d:
         sum = sum + d[key]
-    @return sum
+    return sum
               ]]></code>
             </item>
           </unorderedlist>
@@ -6607,8 +6600,8 @@ The latest version of Haskell can be downloaded with the Haskell Platform: <b><a
       <text><![CDATA[
 Haskell code is organized into <i>modules</i>. There is one named module per Haskell file, and the file name should match the module name (e.g., the file <code>Example.hs</code> should contain the <code>Example</code> module definition). The module body consists of a series of declarations, which can appear in any order; the only exception is that if there are multiple declarations for a function, they must all be grouped together.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
-@module Example @where
+      <code class="haskell"><![CDATA[
+module Example where
 
 g (x) = f(x) + f(x);
 
@@ -6620,12 +6613,12 @@ f (x) = f(x - 1) + 1;
       <text><![CDATA[
 Each declaration in a Haskell module falls into one of two categories: an expression-level declaration, or a type-level declaration. Any declaration that defines variables or functions is an expression-level declaration; any declaration that defines a type is a type-level declaration.
       ]]></text>
-      <code hooks="Haskell"><![CDATA[
+      <code class="haskell"><![CDATA[
 -- Expression-level declaration (defines a new function called "f").
 f(x) = 2 * x                      
 
 -- Type-level declaration (defines a new data type called "Tree".
-@data Tree = Leaf | Node Tree Tree 
+data Tree = Leaf | Node Tree Tree 
       ]]></code>
     </subsection>
     <subsection title="Common data structures (i.e., Haskell expressions)">
@@ -6643,14 +6636,14 @@ The Haskell <a href="http://hackage.haskell.org/package/base">base</a> library (
               The built-in syntax <code>if ... then ... else ...</code> is also available (similar to Python's <code>... if ... else ...</code> and C/C++/Java's ternary operator <code> ... ? ... : ...</code>.
             ]]></item>
           </unorderedlist>
-          <code hooks="Haskell"><![CDATA[
+          <code class="haskell"><![CDATA[
 *> True
 True
 *> False
 False
 *> True || False && True && (not False)
 True
-*> @if True @then "Yes" @else "No"
+*> if True then "Yes" else "No"
 "Yes"
           ]]></code>
         </item>
@@ -6660,7 +6653,7 @@ True
             <item><![CDATA[The usual arithmetic operations are available using the operators <code>+</code>, <code>*</code>, <code>-</code>, <code>/</code>, and <code>^</code>. The <code>Prelude</code> function <code>div</code> represents integer division. The <code>Prelude</code> functions <code>min</code> and <code>max</code> make it possible to compute the minimum and maximum of two integers, respectively, and the function <code>minimum</code> and <code>maximum</code> make it possible to compute the minimum and maximum of a list of integers. Negative integers are prefixed with the negation operator <code>-</code>.]]></item>
             <item><![CDATA[The usual relational operators <code>==</code>, <code>/=</code> (not equal), <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code> are available.]]></item>
           </unorderedlist>
-          <code hooks="Haskell"><![CDATA[
+          <code class="haskell"><![CDATA[
 *> 123
 123
 *> 1 * (2 + 3) `div` 4 - 5
@@ -6680,7 +6673,7 @@ True
             <item><![CDATA[Two strings can be concatenated using <code>++</code>.]]></item>
             <item><![CDATA[The <code>Prelude</code>function <code>length</code> returns the length of a string.]]></item>
           </unorderedlist>
-          <code hooks="Haskell"><![CDATA[
+          <code class="haskell"><![CDATA[
 *> "Example."        -- A string.
 "Example."
 *> length "ABCD"     -- String length.
@@ -6698,7 +6691,7 @@ True
             <item><![CDATA[The <code>Prelude</code> function <code>length</code> returns the length of a list.]]></item>
             <item><![CDATA[To check if a value is in a list, use the <code>Prelude</code> function <code>elem</code> (note that this relies on the <code>==</code> operation being defined on the type of the elements in the list).]]></item>
           </unorderedlist>
-          <code hooks="Haskell"><![CDATA[
+          <code class="haskell"><![CDATA[
 *> [1,2,3]            -- A list.
 [1,2,3]
 *> 1 : [2,3]          -- Adding an element to the front.
@@ -6717,7 +6710,7 @@ True
             <item><![CDATA[The empty tuple is denoted using <code>()</code>.]]></item>
             <item><![CDATA[There are no tuples containing a single element; <code>(e)</code> is equivalent to <code>e</code> for any Haskell expression <code>e</code>.]]></item>
           </unorderedlist>
-          <code hooks="Haskell"><![CDATA[
+          <code class="haskell"><![CDATA[
 *> (1,2,3)  -- A tuple.
 (1,2,3)
           ]]></code>

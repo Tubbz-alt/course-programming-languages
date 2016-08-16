@@ -19,21 +19,21 @@ Your solutions to each of the problem parts below will be graded on their correc
               <text><![CDATA[
 Implement a function <code>regexp()</code> that takes a list of tokens and returns a single string. This string should be a regular expression that matches only the tokens in that list and nothing else.
               ]]></text>
-              <code hooks="Python"><![CDATA[
+              <code class="py"><![CDATA[
 >>> re.match(regexp(["abc", "def", "xyz"]), "abc")
 <_sre.SRE_Match object; span=(0, 3), match='abc'>
 >>> re.match(regexp(["abc", "def", "xyz"]), "ghi")
-@None
+None
               ]]></code>
             </part>
             <part>
               <text><![CDATA[
 Implement a function <code>tokenize()</code> that takes two arguments: a list of terminals and a concrete syntax character string to tokenize. It should build a regular expression, use that regular expression to convert the second string into a token sequence (represented in Python as a list of strings), and then return that token sequence. <b style="color:green;">You should not assume the tokens will always be separated by spaces in the concrete syntax</b>.
               ]]></text>
-              <code hooks="Python">
+              <code class="py"><![CDATA[
 >>> tokenize(["red", "blue", "#"], "red#red blue# red#blue")
 ['red', '#', 'red', 'blue', '#', 'red', '#', 'blue']
-              </code>
+              ]]></code>
             </part>
             <part>
               <text><![CDATA[
@@ -49,7 +49,7 @@ Implement a predictive recursive descent parsing algorithm <code>tree()</code> t
               <text><![CDATA[
 Each node in the parse tree should be labeled <code>"Two"</code>, <code>"One"</code>, or <code>"Zero"</code>. An example input and output are provided below. <b style="color:green;">Note that your implementation of <code>tree()</code> must return a tuple containing the parse tree as well as the token list containing the remaining unparsed tokens (the token list may be empty).</b>
               ]]></text>
-              <code hooks="Python"><![CDATA[
+              <code class="py"><![CDATA[
 >>> tree(tokenize(\
                ["children", "child", "two", "one", "zero", "start", "end", ";"],\
                "one child start two children start one child start zero children end; zero children end end"\
@@ -59,7 +59,7 @@ Each node in the parse tree should be labeled <code>"Two"</code>, <code>"One"</c
               <text><![CDATA[
 For a different view of the parse tree component (the first element in the output tuple above), we reproduce below the parse tree with indentation using the <code>json</code> module. <b style="color:green;">Your implementation does not need to format its results in this way and can produce it in the above format.</b>
               ]]></text>
-              <code hooks="Python"><![CDATA[
+              <code class="py"><![CDATA[
 {'One': [
     {'Two': [
         {'One': [
@@ -104,12 +104,12 @@ In this problem you will implement a complete parser for a programming language 
           <text><![CDATA[
 In addition to a function corresponding to the tokenization algorithm, the parser implementation will consist of five interdependent Python functions: <code>program()</code>, <code>formula()</code>, <code>term()</code>, <code>variable()</code>, and <code>number()</code>. Each function corresponds to one of the productions. Below is an implementation of <code>number()</code>:
           ]]></text>
-          <code hooks="Python">
-@import re
-@def number(tokens):
-    @if re.match(r"^(0|([1-9][0-9]*))$", tokens[0]):
-        @return ({"Number": [@int(tokens[0])]}, tokens[1:])
-          </code>
+          <code class="py"><![CDATA[
+import re
+def number(tokens):
+    if re.match(r"^(0|([1-9][0-9]*))$", tokens[0]):
+        return ({"Number": [int(tokens[0])]}, tokens[1:])
+          ]]></code>
           <text><![CDATA[
 You should examine each of the other productions to determine whether a <a href="#47254608df414ace8d04c630a2b15689">predictive recursive descent</a> parser or a <a href="#95cb72f5b4d24ddba2c8081c7b42618a">backtracking recursive descent</a> parser is required. You should also make calls within each function to one or more of the other functions as needed.
           ]]></text>
@@ -126,7 +126,7 @@ Implement a function <code>variable()</code> that takes a single token list as a
                <text><![CDATA[
 Implement a function <code>term()</code> that takes a single token list as an argument and, if the token sequence conforms to the grammar definition, returns a tuple containing two values: an instance of the abstract syntax (i.e., parse tree) with an appropriate root node label (<code>"Plus"</code>, <code>"Max"</code>, <code>"If"</code>, <code>"Variable"</code>, or <code>"Number"</code>), and the remaining, unparsed suffix of the input token sequence.
                ]]></text>
-               <code hooks="Python">
+               <code class="py"><![CDATA[
 >>> term(['max', '(', 'plus', '(', '#', '2', ',', '#', '3', ')', ',', '#', '4', ')'])
 (
   { "Max": [
@@ -140,7 +140,7 @@ Implement a function <code>term()</code> that takes a single token list as an ar
   },
   [] # Empty token sequence.
 )
-              </code>
+              ]]></code>
             </part>
             <part>
                <text><![CDATA[
