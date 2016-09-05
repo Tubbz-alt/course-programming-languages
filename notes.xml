@@ -1,4 +1,8 @@
-<sheaf title="Concepts of Programming Languages" authors="Andrei Lapets">
+<sheaf title="Concepts of Programming Languages"
+       subtitle="Parsing, Interpretation, Compilation, Type Systems, and Programming Paradigms"
+       author="Andrei Lapets"
+       authorlink="http://lapets.io"
+       >
   <section title="Introduction, Background, and Motivation">
     <subsection title="Overview">
       <text><![CDATA[
@@ -835,7 +839,7 @@ Also note that the resulting parser implementation <code>formula()</code> uses b
         ]]></paragraph>
       </example>
     </subsection>
-    <include sheaf="assignment-one.xml"/>
+    <!--include sheaf="assignment-one.xml"/-->
   </section>
   <section title="Semantics, Evaluation, and Interpretation">
     <subsection title="Formally defining an abstract syntax">
@@ -1614,7 +1618,7 @@ It is important to consider the relationship between the interpreted language an
 </table>
       ]]></diagram>
     </subsection>
-    <include sheaf="assignment-two.xml"/>
+    <!--include sheaf="assignment-two.xml"/-->
   </section>
   <section title="Compilation">
     <text><![CDATA[
@@ -2434,7 +2438,7 @@ set 5 1             # print true;
  - compiling to a platform supporting parallelism
       -->
     </subsection>
-    <include sheaf="assignment-three.xml"/>
+    <!--include sheaf="assignment-three.xml"/-->
     <subsection title="Common compiler optimizations and register allocation">
       <text><![CDATA[
 Optimization algorithms are typically transformations of the abstract syntax of a language. In a compiler, this abstract syntax is usually that of a particular intermediate representation used within the compiler, but optimizations might occur at any stage in the compilation process.
@@ -4088,7 +4092,7 @@ data Formula =
         ]]></code>
       </example>
     </subsection>
-    <include sheaf="assignment-four.xml"/>
+    <!--include sheaf="assignment-four.xml"/-->
     <subsection title="Type system of the typed declarative language Haskell">
       <text hooks="math"><![CDATA[
 Haskell natively supports defining and using algebraic data types, tuples, lists, and functions. The Haskell type system provides a good way to organize and document these data structures, and governs how they can be combined. The abstract syntax for a portion of the Haskell type system is provided below.
@@ -5439,7 +5443,7 @@ More generally, it's possible to update individual document elements using the <
         ]]></text>
       </example>
     </subsection>
-    <include sheaf="assignment-five.xml"/>
+    <!--include sheaf="assignment-five.xml"/-->
     <subsection title="Folds, Monads, and Algebraic Properties of Programs">
       <text><![CDATA[
 In this section we introduce several consequences of viewing programs as a collection of functions (possibly assembled from building blocks such as folds and unfolds) that can be composed.
